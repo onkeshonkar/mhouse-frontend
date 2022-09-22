@@ -2,7 +2,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 import { Bell, Logout, News, Settings, Search } from "./icons"
-import ProfileImage from "./ui/ProfileImage"
+import Avatar from "./ui/Avatar"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -38,7 +38,7 @@ const Header = () => {
       <div className="flex items-center justify-between h-20 mx-auto px-5 bg-white rounded-b-2xl shadow-bottom">
         <div className="flex gap-4">
           <div className="w-12 h-12 bg-slate-400 rounded-full flex items-center justify-center">
-            <ProfileImage user={user} width={200} height={200} />
+            <Avatar user={user} width={200} height={200} />
           </div>
 
           <div>

@@ -1,6 +1,6 @@
 const Logo = (props) => (
   <svg
-    width={370}
+    width={250}
     height={100}
     viewBox="0 0 370 100"
     fill="none"

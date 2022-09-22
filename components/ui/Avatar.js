@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-const ProfileImage = ({ user, width, height }) => {
+const Avatar = ({ user, width, height }) => {
   return (
     <>
       {user.avatar ? (
@@ -21,4 +21,4 @@ const ProfileImage = ({ user, width, height }) => {
   )
 }
 
-export default ProfileImage
+export default Avatar
