@@ -9,6 +9,7 @@ import { Logo } from "../../components/icons"
 import Avatar from "../../components/ui/Avatar"
 import OTPBox from "../../components/ui/OTPBox"
 import { useState } from "react"
+import useRedirectDashboard from "../../hooks/useRedirectDashboard"
 
 const schema = z.object({
   password: z.string().regex(/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,16}$/, {
@@ -25,6 +26,7 @@ const user = {
 }
 
 const LoginInvite = () => {
+  useRedirectDashboard()
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [otp, setOtp] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [showOtpBox, setShowOtpBox] = useState(false) //  will ask otp for email verification

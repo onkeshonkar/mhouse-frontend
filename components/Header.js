@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
+import useUserStore from "../stores/useUserStore"
 
 import { Bell, Logout, News, Settings, Search } from "./icons"
 import Avatar from "./ui/Avatar"
@@ -14,23 +15,18 @@ const navMenu = [
   { href: "/notifications", icon: Bell },
 ]
 
-const user = {
-  fullName: "Onkesh",
-  avatar:
-    "https://assets.foodlert.com/sick-certificates/6325a65443820fc3a7c8052a-1663702770981.jpg",
-  type: "OWNER",
-  branch: { name: "Sydney" },
-}
-
 const Header = () => {
+  const user = useUserStore((store) => store.user)
   const route = useRouter()
 
   const handleCheckout = () => {}
 
   const handleSearch = () => {}
 
+  const logOut = useUserStore((store) => store.logOut)
   const handleLogout = () => {
-    route.push("auth/login")
+    logOut()
+    route.replace("auth/login")
   }
 
   return (

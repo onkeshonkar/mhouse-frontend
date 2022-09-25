@@ -1,3 +1,6 @@
+import { useEffect } from "react"
+import Spinner from "../components/ui/Spinner"
+
 const Dashboard = () => {
   return (
     <div className="mt-2 ml-2">

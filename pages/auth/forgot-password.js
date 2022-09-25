@@ -6,7 +6,6 @@ import toast from "react-hot-toast"
 import Input from "../../components/ui/Input"
 import Button from "../../components/ui/Button"
 import { Logo, Arrow } from "../../components/icons"
-import { useState } from "react"
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -29,7 +28,7 @@ const ForgotPassword = () => {
       <div className="py-10">
         <Logo />
       </div>
-
+      {console.log("body")}
       <div className="bg-white px-20 py-10 rounded-2xl text-center shadow-2xl">
         <h2 className="text-4xl font-medium">Enter Your Email</h2>
 

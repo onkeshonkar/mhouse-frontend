@@ -7,6 +7,7 @@ import Button from "../../components/ui/Button"
 import { Arrow, Logo } from "../../components/icons"
 import { useState } from "react"
 import OTPBox from "../../components/ui/OTPBox"
+import useRedirectDashboard from "../../hooks/useRedirectDashboard"
 
 const schema = z.object({
   venueName: z
@@ -32,6 +33,8 @@ const schema = z.object({
 })
 
 const Signup = () => {
+  useRedirectDashboard()
+
   const [otp, setOtp] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [showOtpBox, setShowOtpBox] = useState(false) //  will ask otp for email verification
 

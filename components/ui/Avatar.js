@@ -14,7 +14,7 @@ const Avatar = ({ user, width, height }) => {
         />
       ) : (
         <span className="text-xl text-white flex p-0">
-          {user.fullName?.charAt(0)}
+          {user.fullName?.charAt(0).toUpperCase()}
         </span>
       )}
     </>

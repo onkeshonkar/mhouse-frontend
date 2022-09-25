@@ -8,6 +8,9 @@ import Button from "../../components/ui/Button"
 import { Logo } from "../../components/icons"
 import { useState } from "react"
 import OTPBox from "../../components/ui/OTPBox"
+import useUserStore from "../../stores/useUserStore"
+import { useRouter } from "next/router"
+import useRedirectDashboard from "../../hooks/useRedirectDashboard"
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -17,8 +20,16 @@ const schema = z.object({
 })
 
 const Login = () => {
+  useRedirectDashboard()
+
   const [otp, setOtp] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [showOtpBox, setShowOtpBox] = useState(false) //  will ask otp for email verification
+
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  const setAuthToken = useUserStore((store) => store.setAuthToken)
+  const setUser = useUserStore((store) => store.setUser)
 
   const handleVerifyEmail = () => {
     console.log("hello")
@@ -30,9 +41,28 @@ const Login = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
 
-  const onSubmit = (data) => {
-    toast.success("data")
-    console.log(data)
+  const onSubmit = async (d) => {
+    setLoading(true)
+
+    const res = await fetch("http://localhost:4000/api/v1/user/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: d.email, password: d.password }),
+    })
+    const data = await res.json()
+    const { user, token, error, message } = data
+
+    if (error) {
+      toast.error(message)
+      setLoading(false)
+    } else {
+      toast.success("Login Successfull")
+      setUser(user)
+      setAuthToken(token)
+      router.replace("/dashboard")
+    }
   }
 
   return (
@@ -83,12 +113,12 @@ const Login = () => {
                 error={errors.password}
               />
               <a
-                href="reset-password"
+                href="forgot-password"
                 className="text-right text-sm font-thin inline-block text-accent hover:underline"
               >
                 Forgot Password?
               </a>
-              <Button>Sign In</Button>
+              <Button loading={loading}>Sign In</Button>
             </form>
           </>
         )}
