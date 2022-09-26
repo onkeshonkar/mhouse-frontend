@@ -46,7 +46,8 @@ const Layout = ({ children }) => {
   const { user, error } = useUser()
 
   useEffect(() => {
-    if (!storeUser && !authTokenExists) router.replace("/auth/login")
+    if (!storeUser && !authTokenExists && path !== "auth")
+      router.replace("/auth/login")
   }, [authTokenExists])
 
   useEffect(() => {

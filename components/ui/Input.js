@@ -19,7 +19,7 @@ const Input = React.forwardRef(
           </label>
         </div>
         {error && (
-          <span className="text-[10px] text-x-red flex items-start pl-2 mt-0.5">
+          <span className=" text-[11px] text-x-red flex items-start pl-2 mt-1">
             {error.message}
           </span>
         )}

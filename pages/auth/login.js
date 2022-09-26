@@ -6,11 +6,12 @@ import toast from "react-hot-toast"
 import Input from "../../components/ui/Input"
 import Button from "../../components/ui/Button"
 import { Logo } from "../../components/icons"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import OTPBox from "../../components/ui/OTPBox"
 import useUserStore from "../../stores/useUserStore"
 import { useRouter } from "next/router"
 import useRedirectDashboard from "../../hooks/useRedirectDashboard"
+import { APIService } from "../../lib/axios"
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -28,11 +29,34 @@ const Login = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
+  const otpTokenRef = useRef()
+
   const setAuthToken = useUserStore((store) => store.setAuthToken)
   const setUser = useUserStore((store) => store.setUser)
 
-  const handleVerifyEmail = () => {
-    console.log("hello")
+  const handleVerifyEmail = async () => {
+    setLoading(true)
+    const OTP = Object.values(otp).join("")
+    setLoading(true)
+
+    try {
+      const res = await APIService.post("/v1/user/auth/verify-otp", {
+        otp: OTP,
+        verifyOTPToken: otpTokenRef.current,
+      })
+
+      const { user, authToken } = res.data
+      setLoading(false)
+      toast.success("Login successfull")
+
+      setUser(user)
+      setAuthToken(authToken)
+      router.replace("/dashboard")
+    } catch (error) {
+      const { message } = error.response?.data
+      toast.error(message)
+      setLoading(false)
+    }
   }
 
   const {
@@ -41,27 +65,31 @@ const Login = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
 
-  const onSubmit = async (d) => {
+  const onSubmit = async (data) => {
     setLoading(true)
 
-    const res = await fetch("http://localhost:4000/api/v1/user/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: d.email, password: d.password }),
-    })
-    const data = await res.json()
-    const { user, token, error, message } = data
+    try {
+      const res = await APIService.post("/v1/user/auth/login", { ...data })
 
-    if (error) {
-      toast.error(message)
+      const { user, authToken, verifyOTPToken, message } = res.data
+
+      if (verifyOTPToken) {
+        toast.success(message, { duration: 2000 })
+        setLoading(false)
+        setShowOtpBox(true)
+        otpTokenRef.current = verifyOTPToken
+        return
+      }
       setLoading(false)
-    } else {
-      toast.success("Login Successfull")
+      toast.success("Welcome Back")
       setUser(user)
-      setAuthToken(token)
+      setAuthToken(authToken)
       router.replace("/dashboard")
+    } catch (error) {
+      setLoading(false)
+      const { message } = error?.response?.data
+      toast.error(message || JSON.stringify(error))
+      console.log(error)
     }
   }
 
@@ -75,16 +103,18 @@ const Login = () => {
         {showOtpBox ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-4xl font-semibold">OTP Verification </h2>
-            <p className="text-sm opacity-50">
-              Enter otp sent to your registered email
-            </p>
+            <p className="text-sm opacity-50">Please Check Your Email</p>
 
             <div className="mt-4">
               <OTPBox value={otp} handleValue={setOtp} />
             </div>
 
-            <Button className="mt-10" onClick={handleVerifyEmail}>
-              Submit
+            <Button
+              loading={loading}
+              className="mt-10"
+              onClick={handleVerifyEmail}
+            >
+              Verify
             </Button>
           </div>
         ) : (

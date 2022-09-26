@@ -2,12 +2,17 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
+import toast from "react-hot-toast"
+
 import Input from "../../components/ui/Input"
 import Button from "../../components/ui/Button"
 import { Arrow, Logo } from "../../components/icons"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import OTPBox from "../../components/ui/OTPBox"
 import useRedirectDashboard from "../../hooks/useRedirectDashboard"
+import useUserStore from "../../stores/useUserStore"
+import { APIService } from "../../lib/axios"
+import { useRouter } from "next/router"
 
 const schema = z.object({
   venueName: z
@@ -18,9 +23,9 @@ const schema = z.object({
     .string()
     .min(3, { message: "Name should be at least 3 char" })
     .max(50),
-  phoneNumber: z
-    .string()
-    .regex(/^\d{10}$/, { message: "Phone should be 10 digits" }),
+  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
+    message: "Phone No.should be 10 digits with country code +61",
+  }),
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().regex(/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,16}$/, {
     message: "Password should be 8 char size with 1 number & 1 special char",
@@ -37,9 +42,35 @@ const Signup = () => {
 
   const [otp, setOtp] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [showOtpBox, setShowOtpBox] = useState(false) //  will ask otp for email verification
+  const [loading, setLoading] = useState(false)
 
-  const handleVerifyEmail = () => {
-    console.log("hello")
+  const otpTokenRef = useRef()
+  const router = useRouter()
+
+  const setAuthToken = useUserStore((store) => store.setAuthToken)
+  const setUser = useUserStore((store) => store.setUser)
+
+  const handleVerifyEmail = async () => {
+    const OTP = Object.values(otp).join("")
+    setLoading(true)
+
+    try {
+      const res = await APIService.post("/v1/user/auth/verify-otp", {
+        otp: OTP,
+        verifyOTPToken: otpTokenRef.current,
+      })
+
+      const { user, authToken } = res.data
+      toast.success("Signup successfull")
+      setLoading(false)
+      setUser(user)
+      setAuthToken(authToken)
+      router.replace("/dashboard")
+    } catch (error) {
+      const { message } = error.response?.data
+      toast.error(message)
+      setLoading(false)
+    }
   }
 
   const {
@@ -48,7 +79,29 @@ const Signup = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
 
-  const onSubmit = (data) => console.log(data)
+  const onSubmit = async (data) => {
+    if (data.password !== data.cnfPassword) {
+      return toast.error("Passwords do not match!")
+    }
+
+    setLoading(true)
+    console.log(data)
+    try {
+      const res = await APIService.post("/v1/user/auth/signup", { ...data })
+
+      const { verifyOTPToken, message } = res.data
+
+      toast.success(message, { duration: 2000 })
+      otpTokenRef.current = verifyOTPToken
+      setLoading(false)
+      setShowOtpBox(true)
+    } catch (error) {
+      setLoading(false)
+      const { message } = error?.response?.data
+      toast.error(message || JSON.stringify(error))
+      console.log(error)
+    }
+  }
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -60,15 +113,17 @@ const Signup = () => {
         {showOtpBox ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-4xl font-semibold">OTP Verification </h2>
-            <p className="text-sm opacity-50">
-              Enter otp sent to your registered email
-            </p>
+            <p className="text-sm opacity-50">Please Check Your Email</p>
 
             <div className="mt-4">
               <OTPBox value={otp} handleValue={setOtp} />
             </div>
 
-            <Button className="mt-10" onClick={handleVerifyEmail}>
+            <Button
+              loading={loading}
+              className="mt-10"
+              onClick={handleVerifyEmail}
+            >
               Submit
             </Button>
           </div>
@@ -94,6 +149,7 @@ const Signup = () => {
                 <Input
                   type="phoneNumber"
                   label="Phone Number"
+                  defaultValue={"+61"}
                   autoComplete="phoneNumber"
                   {...register("phoneNumber")}
                   error={errors.phoneNumber}
@@ -136,7 +192,7 @@ const Signup = () => {
                 </div>
               </div>
 
-              <Button className="mx-auto mt-12">
+              <Button loading={loading} className="mx-auto mt-12">
                 <span>Create Account</span>
                 <Arrow
                   width={20}
@@ -144,7 +200,7 @@ const Signup = () => {
                   className="group-hover:translate-x-1 duration-300 ml-6"
                 />
               </Button>
-            </form>{" "}
+            </form>
           </>
         )}
       </div>
