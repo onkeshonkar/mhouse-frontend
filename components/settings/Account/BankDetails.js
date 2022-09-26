@@ -8,25 +8,32 @@ import Button from "../../ui/Button"
 import { APIService } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 import { useState } from "react"
+import SelectBankName from "../../ui/SelectBankName"
+import SelectCurrency from "../../ui/SelectCurrency"
 
-const schema = z.object({
-  bankAccount: z.string(),
-})
+const schema = z
+  .object({
+    bankAccount: z.string().min(3, { message: "Bank Account is required" }),
+  })
+  .required()
 
 const BankDetails = () => {
-  const [loading, setLoading] = useState(false)
+  const user = useUserStore((store) => store.user)
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  const storeUser = useUserStore((store) => store.user)
+  const [loading, setLoading] = useState(false)
+  const [bankName, setBankName] = useState(user.branch?.bankName || "")
+  const [currency, setCurrency] = useState(user.branch?.currency || "")
 
   const onSubmit = async (data) => {
-    console.log(data)
-
     try {
-      await APIService.patch(`/v1/user/${storeUser.id}/password`, {
-        ...data,
+      await APIService.patch(`/v1/branches/${selectedBranch.id}/bank-details`, {
+        bankAccount: data.bankAccount,
+        bankName,
+        currency,
       })
 
-      toast.success("Password Updated!")
+      toast.success("Bank Details updated.")
       setLoading(false)
     } catch (error) {
       const { message } = error?.response?.data || ""
@@ -40,9 +47,34 @@ const BankDetails = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
+
   return (
     <div className="bg-white flex gap-11 px-9 py-6 rounded-2xl">
-      BankDetails
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex justify-between  flex-grow"
+      >
+        <div className="bg-background rounded-2xl relative overflow-hiddenl focus-within:ring-2 ring-accent flex items-center h-[50px] w-[312px]">
+          <SelectBankName selectedBank={bankName} onChange={setBankName} />
+        </div>
+
+        <Input
+          type="text"
+          label="Bank Account"
+          autoComplete="bankAccount"
+          defaultValue={user.branch.bankAccount}
+          {...register("bankAccount")}
+          error={errors.bankAccount}
+        />
+
+        <div className="bg-background rounded-2xl relative overflow-hiddenl focus-within:ring-2 ring-accent flex items-center h-[50px] w-[312px]">
+          <SelectCurrency selectedCurrency={currency} onChange={setCurrency} />{" "}
+        </div>
+
+        <Button loading={loading} className="self-center">
+          Update Change
+        </Button>
+      </form>
     </div>
   )
 }

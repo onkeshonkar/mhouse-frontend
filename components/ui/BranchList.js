@@ -12,7 +12,7 @@ const BranchList = ({ value, onChange }) => {
   const [selectedBranch, setSelectedBranch] = useState()
 
   const { data, error } = useSWR(
-    `/v1/restaurents/${user.branch.restaurent}/branches`,
+    `/v1/restaurents/${user.branch.restaurent.id}/branches`,
     branchFetcher,
     {
       revalidateOnFocus: false,
@@ -65,7 +65,7 @@ const BranchList = ({ value, onChange }) => {
                       } py-1.5 pl-8 rounded-lg my-1 flex items-center relative opacity-80 text-primary text-sm`}
                     >
                       {selected && (
-                        <span className="absolute left-4">
+                        <span className="absolute left-4 text-x-green">
                           <Check />
                         </span>
                       )}

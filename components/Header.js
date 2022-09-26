@@ -109,12 +109,7 @@ const Header = () => {
           {user.type !== "OWNER" ? (
             <div className="w-full text-sm px-6 pt-3">{user.branch.name}</div>
           ) : (
-            <BranchList
-              value={selectedBranch}
-              onChange={(branch) => {
-                setSelectedBranch(branch)
-              }}
-            />
+            <BranchList value={selectedBranch} onChange={setSelectedBranch} />
           )}
           <label className="absolute text-xs opacity-50 left-6 top-1">
             Branch

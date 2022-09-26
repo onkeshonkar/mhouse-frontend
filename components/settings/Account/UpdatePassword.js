@@ -87,7 +87,9 @@ const UpdatePassword = () => {
           error={errors.cnfrmPassword}
         />
 
-        <Button loading={loading}>Change Password</Button>
+        <Button loading={loading} className="self-center">
+          Change Password
+        </Button>
       </form>
     </div>
   )
