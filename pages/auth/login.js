@@ -33,6 +33,7 @@ const Login = () => {
 
   const setAuthToken = useUserStore((store) => store.setAuthToken)
   const setUser = useUserStore((store) => store.setUser)
+  const setSelectedBranch = useUserStore((store) => store.setSelectedBranch)
 
   const handleVerifyEmail = async () => {
     setLoading(true)
@@ -51,6 +52,7 @@ const Login = () => {
 
       setUser(user)
       setAuthToken(authToken)
+      setSelectedBranch(user.branch)
       router.replace("/dashboard")
     } catch (error) {
       const { message } = error.response?.data
@@ -84,6 +86,7 @@ const Login = () => {
       toast.success("Welcome Back")
       setUser(user)
       setAuthToken(authToken)
+      setSelectedBranch(user.branch)
       router.replace("/dashboard")
     } catch (error) {
       setLoading(false)

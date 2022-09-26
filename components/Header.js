@@ -4,6 +4,7 @@ import useUserStore from "../stores/useUserStore"
 
 import { Bell, Logout, News, Settings, Search } from "./icons"
 import Avatar from "./ui/Avatar"
+import BranchList from "./ui/BranchList"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -17,13 +18,16 @@ const navMenu = [
 
 const Header = () => {
   const user = useUserStore((store) => store.user)
+  const logOut = useUserStore((store) => store.logOut)
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const setSelectedBranch = useUserStore((store) => store.setSelectedBranch)
+
   const route = useRouter()
 
   const handleCheckout = () => {}
 
   const handleSearch = () => {}
 
-  const logOut = useUserStore((store) => store.logOut)
   const handleLogout = () => {
     logOut()
     route.replace("auth/login")
@@ -102,7 +106,16 @@ const Header = () => {
         </div>
 
         <div className="bg-primary text-white rounded-2xl h-12 relative flex items-center min-w-[176px]">
-          <div className="w-full text-sm px-6 pt-3">{user.branch.name}</div>
+          {user.type !== "OWNER" ? (
+            <div className="w-full text-sm px-6 pt-3">{user.branch.name}</div>
+          ) : (
+            <BranchList
+              value={selectedBranch}
+              onChange={(branch) => {
+                setSelectedBranch(branch)
+              }}
+            />
+          )}
           <label className="absolute text-xs opacity-50 left-6 top-1">
             Branch
           </label>

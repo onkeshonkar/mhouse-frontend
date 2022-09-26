@@ -36,6 +36,7 @@ const Layout = ({ children }) => {
   const authToken = useUserStore((store) => store.authToken)
   const storeUser = useUserStore((store) => store.user)
   const logOut = useUserStore((store) => store.logOut)
+  const setSelectedBranch = useUserStore((store) => store.setSelectedBranch)
 
   const readAuthToken = useUserStore((store) => store.readAuthToken)
 
@@ -53,6 +54,7 @@ const Layout = ({ children }) => {
   useEffect(() => {
     if (user) {
       setUser(user)
+      setSelectedBranch(user.branch)
     }
 
     if (error) {

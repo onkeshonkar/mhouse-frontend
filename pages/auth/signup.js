@@ -49,6 +49,7 @@ const Signup = () => {
 
   const setAuthToken = useUserStore((store) => store.setAuthToken)
   const setUser = useUserStore((store) => store.setUser)
+  const setSelectedBranch = useUserStore((store) => store.setSelectedBranch)
 
   const handleVerifyEmail = async () => {
     const OTP = Object.values(otp).join("")
@@ -65,6 +66,7 @@ const Signup = () => {
       setLoading(false)
       setUser(user)
       setAuthToken(authToken)
+      setSelectedBranch(user.branch)
       router.replace("/dashboard")
     } catch (error) {
       const { message } = error.response?.data
