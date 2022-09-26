@@ -149,7 +149,7 @@ const Signup = () => {
                   error={errors.fullName}
                 />
                 <Input
-                  type="phoneNumber"
+                  type="text"
                   label="Phone Number"
                   defaultValue={"+61"}
                   autoComplete="phoneNumber"
