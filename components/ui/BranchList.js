@@ -12,12 +12,8 @@ const BranchList = ({ value, onChange }) => {
   const [selectedBranch, setSelectedBranch] = useState()
 
   const { data, error } = useSWR(
-    `/v1/restaurents/${user.branch.restaurent.id}/branches`,
-    branchFetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnMount: true,
-    }
+    `/v1/restaurents/${user.branch.restaurent.id}/branches?details=semi`,
+    branchFetcher
   )
 
   const handleOnChange = (branch) => {
@@ -28,8 +24,8 @@ const BranchList = ({ value, onChange }) => {
   useEffect(() => {
     if (data) {
       setBranches(data.branches)
-      const founnBranch = data.branches.find((branch) => branch.id === value.id)
-      setSelectedBranch(founnBranch)
+      const foundBranch = data.branches.find((branch) => branch.id === value.id)
+      setSelectedBranch(foundBranch)
     }
   }, [data, value])
 

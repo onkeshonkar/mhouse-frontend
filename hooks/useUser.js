@@ -8,7 +8,11 @@ const useUser = () => {
 
   const { data, error, mutate } = useSWR(
     authToken ? "v1/user/me" : null,
-    meFetcher
+    meFetcher,
+    {
+      revalidateOnReconnect: true,
+      revalidateOnFocus: false,
+    }
   )
   const loading = !data && !!error
 

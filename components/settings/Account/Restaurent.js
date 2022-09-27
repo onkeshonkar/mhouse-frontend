@@ -76,26 +76,27 @@ const Restaurent = () => {
         </form>
       )}
 
-      {!user.type && (
-        <>
-          <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
-            <div className="w-full text-sm px-6 pt-3">
-              {user.branch.restaurent?.businessName || ""}
+      {!user.type ||
+        (user.type === "MANAGER" && (
+          <>
+            <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
+              <div className="w-full text-sm px-6 pt-3">
+                {user.branch.restaurent?.businessName || ""}
+              </div>
+              <span className="absolute text-xs opacity-50 left-6 top-1">
+                Business Name
+              </span>
             </div>
-            <span className="absolute text-xs opacity-50 left-6 top-1">
-              Business Name
-            </span>
-          </div>
-          <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
-            <div className="w-full text-sm px-6 pt-3">
-              {user.branch.restaurent?.address || ""}
+            <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
+              <div className="w-full text-sm px-6 pt-3">
+                {user.branch.restaurent?.address || ""}
+              </div>
+              <span className="absolute text-xs opacity-50 left-6 top-1">
+                Main Branch Address
+              </span>
             </div>
-            <span className="absolute text-xs opacity-50 left-6 top-1">
-              Main Branch Address
-            </span>
-          </div>
-        </>
-      )}
+          </>
+        ))}
     </div>
   )
 }

@@ -18,7 +18,7 @@ const tabs = [
 
 const Setting = () => {
   return (
-    <div className="mt-8 ml-6">
+    <div className="mt-8 ml-6 pb-6">
       <main>
         <Tab.Group>
           <Tab.List className="flex">

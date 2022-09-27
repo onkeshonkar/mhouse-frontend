@@ -2,12 +2,13 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import toast from "react-hot-toast"
+import { mutate } from "swr"
 
 import Input from "../../ui/Input"
 import Button from "../../ui/Button"
 import { APIService } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SelectBankName from "../../ui/SelectBankName"
 import SelectCurrency from "../../ui/SelectCurrency"
 
@@ -18,12 +19,11 @@ const schema = z
   .required()
 
 const BankDetails = () => {
-  const user = useUserStore((store) => store.user)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
   const [loading, setLoading] = useState(false)
-  const [bankName, setBankName] = useState(user.branch?.bankName || "")
-  const [currency, setCurrency] = useState(user.branch?.currency || "")
+  const [bankName, setBankName] = useState()
+  const [currency, setCurrency] = useState()
 
   const onSubmit = async (data) => {
     try {
@@ -35,6 +35,9 @@ const BankDetails = () => {
 
       toast.success("Bank Details updated.")
       setLoading(false)
+      mutate(
+        `/v1/restaurents/${selectedBranch.restaurent}/branches?details=semi`
+      )
     } catch (error) {
       const { message } = error?.response?.data || ""
       toast.error(message)
@@ -46,7 +49,14 @@ const BankDetails = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({ resolver: zodResolver(schema) })
+
+  useEffect(() => {
+    setBankName(selectedBranch.bankName || "")
+    setCurrency(selectedBranch.currency || "")
+    setValue("bankAccount", selectedBranch.bankAccount)
+  }, [selectedBranch])
 
   return (
     <div className="bg-white flex gap-11 px-9 py-6 rounded-2xl">
@@ -62,7 +72,7 @@ const BankDetails = () => {
           type="text"
           label="Bank Account"
           autoComplete="bankAccount"
-          defaultValue={user.branch.bankAccount}
+          defaultValue={selectedBranch.bankAccount || ""}
           {...register("bankAccount")}
           error={errors.bankAccount}
         />
