@@ -31,7 +31,8 @@ const UpdatePassword = () => {
   const storeUser = useUserStore((store) => store.user)
 
   const onSubmit = async (data) => {
-    console.log(data)
+    setLoading(true)
+
     if (data.password === data.newPassword) {
       return toast.error("New password and current password can't be same!")
     }

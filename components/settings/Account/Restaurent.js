@@ -22,6 +22,7 @@ const Restaurent = () => {
   const user = useUserStore((store) => store.user)
 
   const onSubmit = async (data) => {
+    setLoading(true)
     try {
       await APIService.patch(
         `/v1/restaurents/${user.branch.restaurent.id}/businnes-details`,

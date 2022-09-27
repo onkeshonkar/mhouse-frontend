@@ -1,6 +1,7 @@
 import { Tab } from "@headlessui/react"
 
 import Account from "../components/settings/Account"
+import Notification from "../components/settings/NotificationSettings"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -8,7 +9,7 @@ function classNames(...classes) {
 
 const tabs = [
   { name: "Account", panel: Account },
-  // { name: "Notifications", panel: "Notification" },
+  { name: "Notifications", panel: Notification },
   // { name: "My Team", panel: "MyTeam" },
   // { name: "My Branches", panel: "MyBranch" },
   // { name: "Payroll", panel: "Payroll" },

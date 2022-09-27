@@ -38,6 +38,7 @@ const TimeCurrency = () => {
   }, [selectedBranch])
 
   const onSubmit = async () => {
+    setLoading(true)
     try {
       await APIService.patch(`/v1/branches/${selectedBranch.id}/settings`, {
         timeFormat,

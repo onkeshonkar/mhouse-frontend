@@ -26,6 +26,7 @@ const BankDetails = () => {
   const [currency, setCurrency] = useState()
 
   const onSubmit = async (data) => {
+    setLoading(true)
     try {
       await APIService.patch(`/v1/branches/${selectedBranch.id}/bank-details`, {
         bankAccount: data.bankAccount,
