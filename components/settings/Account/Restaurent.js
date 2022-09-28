@@ -5,9 +5,10 @@ import toast from "react-hot-toast"
 
 import Input from "../../ui/Input"
 import Button from "../../ui/Button"
-import { APIService } from "../../../lib/axios"
+import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 import { useState } from "react"
+import useSWR from "swr"
 
 const schema = z
   .object({
@@ -21,11 +22,16 @@ const Restaurent = () => {
 
   const user = useUserStore((store) => store.user)
 
+  const { data, error, mutate } = useSWR(
+    `/v1/restaurents/${user.branch.restaurent}`,
+    fetcher
+  )
+
   const onSubmit = async (data) => {
     setLoading(true)
     try {
       await APIService.patch(
-        `/v1/restaurents/${user.branch.restaurent.id}/businnes-details`,
+        `/v1/restaurents/${user.branch.restaurent}/businnes-details`,
         {
           ...data,
         }
@@ -46,6 +52,8 @@ const Restaurent = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
 
+  if (!data) return null
+
   return (
     <div className="bg-white flex gap-11 px-9 py-6 rounded-2xl">
       {user.type && user.type === "OWNER" && (
@@ -57,7 +65,7 @@ const Restaurent = () => {
             type="text"
             label="Bussiness Name"
             autoComplete="businessName"
-            defaultValue={user.branch.restaurent?.businessName || ""}
+            defaultValue={data.restaurent?.businessName || ""}
             {...register("businessName")}
             error={errors.businessName}
           />
@@ -66,7 +74,7 @@ const Restaurent = () => {
             type="text"
             label="Main Branch Address"
             autoComplete="address"
-            defaultValue={user.branch.restaurent.address || ""}
+            defaultValue={data.restaurent.address || ""}
             {...register("address")}
             error={errors.address}
           />
@@ -77,27 +85,26 @@ const Restaurent = () => {
         </form>
       )}
 
-      {!user.type ||
-        (user.type === "MANAGER" && (
-          <>
-            <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
-              <div className="w-full text-sm px-6 pt-3">
-                {user.branch.restaurent?.businessName || ""}
-              </div>
-              <span className="absolute text-xs opacity-50 left-6 top-1">
-                Business Name
-              </span>
+      {(!user.type || user.type === "MANAGER") && (
+        <>
+          <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
+            <div className="w-full text-sm px-6 pt-3">
+              {data.restaurent?.businessName || ""}
             </div>
-            <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
-              <div className="w-full text-sm px-6 pt-3">
-                {user.branch.restaurent?.address || ""}
-              </div>
-              <span className="absolute text-xs opacity-50 left-6 top-1">
-                Main Branch Address
-              </span>
+            <span className="absolute text-xs opacity-50 left-6 top-1">
+              Business Name
+            </span>
+          </div>
+          <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
+            <div className="w-full text-sm px-6 pt-3">
+              {data.restaurent?.address || ""}
             </div>
-          </>
-        ))}
+            <span className="absolute text-xs opacity-50 left-6 top-1">
+              Main Branch Address
+            </span>
+          </div>
+        </>
+      )}
     </div>
   )
 }

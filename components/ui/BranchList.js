@@ -4,7 +4,8 @@ import useSWR from "swr"
 
 import { Check, Chevron } from "../icons"
 import useUserStore from "../../stores/useUserStore"
-import { branchFetcher } from "../../lib/axios"
+import { fetcher } from "../../lib/axios"
+import Spinner from "./Spinner"
 
 const BranchList = ({ value, onChange }) => {
   const user = useUserStore((store) => store.user)
@@ -12,8 +13,9 @@ const BranchList = ({ value, onChange }) => {
   const [selectedBranch, setSelectedBranch] = useState()
 
   const { data, error } = useSWR(
-    `/v1/restaurents/${user.branch.restaurent.id}/branches?details=semi`,
-    branchFetcher
+    `/v1/restaurents/${user.branch.restaurent}/branches?details=semi`,
+    fetcher,
+    { revalidateOnFocus: true }
   )
 
   const handleOnChange = (branch) => {
@@ -29,9 +31,14 @@ const BranchList = ({ value, onChange }) => {
     }
   }, [data, value])
 
-  if (error) return <div>{JSON.stringify(error)}</div>
+  if (error) return toast.error(JSON.stringify(error))
 
-  if (!selectedBranch) return null
+  if (!selectedBranch || !data)
+    return (
+      <div className="text-center mx-auto">
+        <Spinner />
+      </div>
+    )
 
   return (
     <div className="w-full relative">
