@@ -4,9 +4,11 @@ import useSWR from "swr"
 import { Plus, Edit, Delete } from "../../icons"
 import Button from "../../ui/Button"
 import useUserStore from "../../../stores/useUserStore"
-import { fetcher } from "../../../lib/axios"
+import { APIService, fetcher } from "../../../lib/axios"
 import Spinner from "../../ui/Spinner"
 import toast from "react-hot-toast"
+import PayrollGroupModal from "./PayrollGroupModal"
+import ConfirmModal from "../../ui/ConfirmModal"
 
 const PayrollGroup = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
@@ -26,14 +28,67 @@ const PayrollGroup = () => {
     const payrolll = data.payrollGroups.find((p) => p.id === clickedPayrollId)
     setPayrollToModify(payrolll)
     setIsEditPayrollModal(!isEditPayrollModal)
+    console.log(payrolll)
   }
 
   const onDeletePayroll = (e) => {
     const clickedPayrollId = e.currentTarget.name
     const payrolll = data.payrollGroups.find((p) => p.id === clickedPayrollId)
     setPayrollToModify(payrolll)
+    console.log(payrolll, "d")
 
     setIsDeletePayrollModal(!isDeletePayrollModal)
+  }
+
+  const handleAddPayroll = async (payroll) => {
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/payroll-groups`,
+        {
+          ...payroll,
+        }
+      )
+      toast.success("Payroll group added")
+      mutate()
+    } catch (error) {
+      const { message } = error?.response?.data || ""
+      toast.error(message)
+      console.log(error)
+    }
+    setIsAddPayrollModal(false)
+  }
+
+  const handleEditPayroll = async (data) => {
+    try {
+      await APIService.patch(
+        `/v1/branches/${selectedBranch.id}/payroll-groups/${payrollToModify.id}`,
+        {
+          ...data,
+        }
+      )
+      toast.success("Payroll group updated")
+      mutate()
+    } catch (error) {
+      const { message } = error?.response?.data || ""
+      toast.error(message)
+      console.log(error)
+    }
+    setIsEditPayrollModal(false)
+  }
+
+  const handleDeletePayroll = async () => {
+    try {
+      await APIService.delete(
+        `/v1/branches/${selectedBranch.id}/payroll-groups/${payrollToModify.id}`
+      )
+      toast.success("Payroll group Deleted")
+      mutate()
+    } catch (error) {
+      const { message } = error?.response?.data || ""
+      toast.error(message)
+      console.log(error)
+    }
+    setIsDeletePayrollModal(false)
   }
 
   if (error) return toast.error(JSON.stringify(error))
@@ -44,11 +99,40 @@ const PayrollGroup = () => {
         <Spinner />
       </div>
     )
+
   return (
     <>
+      {isAddPayrollModal && (
+        <PayrollGroupModal
+          onClose={() => setIsAddPayrollModal(false)}
+          onPayrollSubmit={handleAddPayroll}
+        />
+      )}
+
+      {isEditPayrollModal && (
+        <PayrollGroupModal
+          onClose={() => setIsEditPayrollModal(false)}
+          onPayrollSubmit={handleEditPayroll}
+          payroll={payrollToModify}
+        />
+      )}
+
+      {isDeletePayrollModal && (
+        <ConfirmModal
+          onClose={() => {
+            setIsDeletePayrollModal(false)
+          }}
+          onConfirm={handleDeletePayroll}
+        />
+      )}
+
       <div className="relative">
         <div className=" absolute right-4 -top-20">
-          <Button>
+          <Button
+            onClick={() => {
+              setIsAddPayrollModal(!isAddPayrollModal)
+            }}
+          >
             <Plus width={15} height={15} />
             <span className="ml-2">New</span>
           </Button>

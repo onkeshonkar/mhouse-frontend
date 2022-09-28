@@ -38,7 +38,9 @@ const AmountInput = ({ value, onChange, children }) => {
             value={value || 0.0}
             className="px-0 py-0 pb-0.5 outline-none focus:ring-0 text-sm font-semibold border-b-2 border-0 border-dashed min-w-[54px] text-center transition-all duration-200"
             onKeyUp={() => setWidth(inputRef.current.offsetWidth)}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value >= 0) onChange(e.target.value)
+            }}
             step="0.05"
             min={0.0}
           />
