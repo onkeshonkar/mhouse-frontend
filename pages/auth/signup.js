@@ -99,8 +99,9 @@ const Signup = () => {
       setShowOtpBox(true)
     } catch (error) {
       setLoading(false)
-      const { message } = error?.response?.data
-      toast.error(message || JSON.stringify(error))
+      const { message } =
+        error?.response?.data || "Something went Wrong on server"
+      toast.error(message)
       console.log(error)
     }
   }

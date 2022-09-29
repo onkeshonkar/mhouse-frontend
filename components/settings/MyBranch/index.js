@@ -48,7 +48,7 @@ const MyBranch = () => {
       toast.success("Branch added")
       mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      const { message } = error?.response?.data || "Can't add Branch"
       toast.error(message)
       console.log(JSON.stringify(error))
     }
@@ -64,7 +64,7 @@ const MyBranch = () => {
       toast.success("Branch updated")
       await mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      const { message } = error?.response?.data || "Can't update Branch"
       toast.error(message)
       console.log(JSON.stringify(error))
     }
@@ -80,9 +80,8 @@ const MyBranch = () => {
       toast.success("Branch Deleted")
       await mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
 
     setIsDeleteBranchModal(!isDeleteBranchModal)

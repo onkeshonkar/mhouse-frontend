@@ -84,14 +84,20 @@ const PayrollGroup = () => {
       toast.success("Payroll group Deleted")
       mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      const { message } = error?.response?.data || message
       toast.error(message)
       console.log(error)
     }
     setIsDeletePayrollModal(false)
   }
 
-  if (error) return toast.error(JSON.stringify(error))
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return toast.error(JSON.stringify(error))
+    }
+  }
 
   if (!data)
     return (

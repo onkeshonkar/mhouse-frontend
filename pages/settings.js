@@ -3,6 +3,7 @@ import { Tab } from "@headlessui/react"
 import Account from "../components/settings/Account"
 import Integration from "../components/settings/Integration"
 import MyBranch from "../components/settings/MyBranch"
+import MyTeam from "../components/settings/MyTeam"
 import Notification from "../components/settings/NotificationSettings"
 import PayrollGroup from "../components/settings/PayrollGroup"
 import PlanBilling from "../components/settings/PlanBillings"
@@ -14,7 +15,7 @@ function classNames(...classes) {
 const tabs = [
   { name: "Account", panel: Account },
   { name: "Notifications", panel: Notification },
-  // { name: "My Team", panel: "MyTeam" },
+  { name: "My Team", panel: MyTeam },
   { name: "My Branches", panel: MyBranch },
   { name: "Payroll", panel: PayrollGroup },
   { name: "Integrations", panel: Integration },

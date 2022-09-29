@@ -58,9 +58,14 @@ const Layout = ({ children }) => {
     }
 
     if (error) {
-      toast.error("Logged out")
-      logOut()
-      router.reload()
+      if (error.code === "ERR_NETWORK" && router.pathname !== "/") {
+        toast.error(error.message)
+        router.replace("/")
+      } else {
+        toast.error("Logged out")
+        logOut()
+        router.reload()
+      }
     }
   }, [user, error])
 

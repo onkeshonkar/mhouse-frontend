@@ -90,8 +90,8 @@ const Login = () => {
       router.replace("/dashboard")
     } catch (error) {
       setLoading(false)
-      const { message } = error?.response?.data
-      toast.error(message || JSON.stringify(error))
+      const { message } = error?.response?.data || error
+      toast.error(message)
       console.log(error)
     }
   }

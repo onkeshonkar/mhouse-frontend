@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react"
 import { Listbox } from "@headlessui/react"
 import useSWR from "swr"
+import toast from "react-hot-toast"
 
 import { Check, Chevron } from "../icons"
 import useUserStore from "../../stores/useUserStore"
 import { fetcher } from "../../lib/axios"
 import Spinner from "./Spinner"
-import toast from "react-hot-toast"
 
-const BranchList = ({ value, onChange }) => {
-  const user = useUserStore((store) => store.user)
+const BranchList = ({ value, onChange, isDarkMode }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [branches, setBranches] = useState([])
-  const [selectedBranch, setSelectedBranch] = useState()
+  const [visibleBranch, setVisibleBranch] = useState()
 
   const { data, error } = useSWR(
-    `/v1/restaurents/${user.branch.restaurent}/branches?details=semi`,
+    `/v1/restaurents/${selectedBranch.restaurent}/branches?details=semi`,
     fetcher,
-    { revalidateOnFocus: true }
+    { revalidateOnFocus: true, errorRetryCount: 3 }
   )
 
   const handleOnChange = (branch) => {
-    setSelectedBranch(branch)
+    setVisibleBranch(branch)
     onChange(branch)
   }
 
@@ -28,13 +28,20 @@ const BranchList = ({ value, onChange }) => {
     if (data) {
       setBranches(data.branches)
       const foundBranch = data.branches.find((branch) => branch.id === value.id)
-      setSelectedBranch(foundBranch)
+      setVisibleBranch(foundBranch)
     }
   }, [data, value])
 
-  if (error) return toast.error(JSON.stringify(error))
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      toast.error(JSON.stringify(error))
+    }
+    return <span className="flex mx-auto">{"can't fetch branch"}</span>
+  }
 
-  if (!selectedBranch || !data)
+  if (!visibleBranch || !data)
     return (
       <div className="text-center mx-auto">
         <Spinner />
@@ -43,11 +50,18 @@ const BranchList = ({ value, onChange }) => {
 
   return (
     <div className="w-full relative">
-      <Listbox value={selectedBranch} onChange={handleOnChange}>
+      <Listbox value={visibleBranch} onChange={handleOnChange}>
         {({ open }) => (
           <>
-            <Listbox.Button className="flex w-full justify-between bg-inherit rounded-2xl text-sm px-6 pb-0 pt-3">
-              <span>{selectedBranch.name}</span>
+            <Listbox.Button
+              className={`flex w-full justify-between items-center rounded-2xl text-sm px-6 pb-0 pt-3 h-[50px] ${
+                isDarkMode ? "bg-primary" : "bg-background"
+              }`}
+            >
+              <span>{visibleBranch.name}</span>
+              <Listbox.Label className="absolute text-xs opacity-50 left-6 top-1">
+                Branch
+              </Listbox.Label>
               <Chevron
                 className={`${
                   open ? "rotate-180" : ""

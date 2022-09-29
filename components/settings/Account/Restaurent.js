@@ -21,9 +21,10 @@ const Restaurent = () => {
   const [loading, setLoading] = useState(false)
 
   const user = useUserStore((store) => store.user)
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
 
   const { data, error, mutate } = useSWR(
-    `/v1/restaurents/${user.branch.restaurent}`,
+    `/v1/restaurents/${selectedBranch.restaurent}`,
     fetcher
   )
 
@@ -31,7 +32,7 @@ const Restaurent = () => {
     setLoading(true)
     try {
       await APIService.patch(
-        `/v1/restaurents/${user.branch.restaurent}/businnes-details`,
+        `/v1/restaurents/${selectedBranch.restaurent}/businnes-details`,
         {
           ...data,
         }
@@ -40,9 +41,9 @@ const Restaurent = () => {
       toast.success("Business updated sucessfully")
       setLoading(false)
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      setLoading(false)
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
   }
 

@@ -55,9 +55,9 @@ const TimeCurrency = () => {
         `/v1/restaurents/${user.branch.restaurent.id}/branches?details=semi`
       )
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      setLoading(false)
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
   }
 

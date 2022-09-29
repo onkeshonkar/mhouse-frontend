@@ -107,13 +107,19 @@ const Header = () => {
 
         <div className="bg-primary text-white rounded-2xl h-12 relative flex items-center min-w-[176px]">
           {user.type !== "OWNER" ? (
-            <div className="w-full text-sm px-6 pt-3">{user.branch.name}</div>
+            <>
+              <div className="w-full text-sm px-6 pt-3">{user.branch.name}</div>
+              <label className="absolute text-xs opacity-50 left-6 top-1">
+                Branch
+              </label>
+            </>
           ) : (
-            <BranchList value={selectedBranch} onChange={setSelectedBranch} />
+            <BranchList
+              value={selectedBranch}
+              onChange={setSelectedBranch}
+              isDarkMode={true}
+            />
           )}
-          <label className="absolute text-xs opacity-50 left-6 top-1">
-            Branch
-          </label>
         </div>
       </div>
     </header>

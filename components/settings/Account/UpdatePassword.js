@@ -49,9 +49,9 @@ const UpdatePassword = () => {
       toast.success("Password Updated!")
       setLoading(false)
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      setLoading(false)
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
   }
 

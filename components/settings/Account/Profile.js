@@ -69,14 +69,13 @@ const Profile = () => {
           toast.custom(JSON.stringify(error))
         }
       }
-
-      toast.success("Profile updated")
       setLoading(false)
+      toast.success("Profile updated")
       setUser(user)
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      setLoading(false)
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
   }
 

@@ -48,9 +48,8 @@ const Notification = () => {
         `/v1/restaurents/${selectedBranch.restaurent.id}/branches?details=semi`
       )
     } catch (error) {
-      const { message } = error?.response?.data || ""
+      const { message } = error?.response?.data || error
       toast.error(message)
-      console.log(JSON.stringify(error))
     }
   }
 
