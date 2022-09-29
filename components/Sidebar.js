@@ -26,9 +26,9 @@ const navMenu = [
   { name: "Finance", href: "/finance", icon: Finance },
   { name: "Schedule", href: "/schedule", icon: Schedule },
   { name: "Workforce", href: "/workforce", icon: Workforce },
-  { name: "Catering Orders", href: "/catering", icon: Orders },
+  { name: "Catering Orders", href: "/catering-orders", icon: Orders },
   { name: "Operations", href: "/operations", icon: Operation },
-  { name: "Menu Enginnering", href: "/menu", icon: Draft },
+  { name: "Menu Enginnering", href: "/menu-engineering", icon: Draft },
 ]
 
 const SideBar = () => {

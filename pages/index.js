@@ -16,7 +16,7 @@ export default function Home() {
 
       <div>
         <Link href="/auth/login">
-          <a className="underline text-blue-800">Login</a>
+          <a className="underline text-accent">Login</a>
         </Link>
       </div>
     </div>
