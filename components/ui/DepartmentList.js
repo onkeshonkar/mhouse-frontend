@@ -91,7 +91,7 @@ const DepartmentList = ({ value, onChange }) => {
                 onChange={(e) => setQuery(e.target.value)}
                 displayValue={value}
                 autoComplete="off"
-                className="w-full bg-inherit text-sm rounded-2xl outline-none focus:ring-0 border-none pt-2 px-6"
+                className="w-full bg-inherit text-sm rounded-2xl outline-none focus:ring-0 border-none pt-2 pl-6"
               />
 
               <Combobox.Label className="absolute text-xs opacity-50 left-6 top-1">

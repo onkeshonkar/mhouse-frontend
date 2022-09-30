@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-const Avatar = ({ user, width, height }) => {
+const Avatar = ({ user, width, height, className }) => {
   return (
     <>
       {user.avatar ? (
@@ -10,7 +10,7 @@ const Avatar = ({ user, width, height }) => {
           width={width}
           height={height}
           objectFit="cover"
-          className="rounded-full"
+          className={`${className || "rounded-full"}`}
         />
       ) : (
         <span className="text-xl text-white flex p-0">

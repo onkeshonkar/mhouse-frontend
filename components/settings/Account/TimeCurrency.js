@@ -71,7 +71,7 @@ const TimeCurrency = () => {
           label={"Time Format"}
         />
 
-        <div className="w-96 bg-background rounded-2xl h-12 relative focus-within:ring-1 flex items-center">
+        <div className="w-96 bg-background rounded-2xl h-12 relative focus-within:ring-2 focus-within:ring-accent flex items-center">
           <ListInput
             value={timeZone}
             onChange={setTimeZone}

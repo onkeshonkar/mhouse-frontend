@@ -29,10 +29,10 @@ const JobTitleList = ({ value, onChange }) => {
           return option.toLowerCase().includes(query.toLowerCase())
         })
 
-  const handleDeleteDeptmnt = async (title) => {
+  const handleDeleteTitle = async (title) => {
     try {
       await APIService.delete(
-        `/v1/branches/${selectedBranch.id}/jobTitles?name=${title}`
+        `/v1/branches/${selectedBranch.id}/job-titles?name=${title}`
       )
       toast.success("JobTitle Deleted")
       mutate()
@@ -48,7 +48,7 @@ const JobTitleList = ({ value, onChange }) => {
     if (!title) return
     setLoading(true)
     try {
-      await APIService.post(`/v1/branches/${selectedBranch.id}/jobTitles`, {
+      await APIService.post(`/v1/branches/${selectedBranch.id}/job-titles`, {
         name: title,
       })
       toast.success("JobTitle added")
@@ -91,7 +91,7 @@ const JobTitleList = ({ value, onChange }) => {
                 onChange={(e) => setQuery(e.target.value)}
                 displayValue={value}
                 autoComplete="off"
-                className="w-full bg-inherit text-sm rounded-2xl outline-none focus:ring-0 border-none pt-2 px-6"
+                className="w-full bg-inherit text-sm rounded-2xl outline-none focus:ring-0 border-none pt-2 pl-6"
               />
 
               <Combobox.Label className="absolute text-xs opacity-50 left-6 top-1">
@@ -130,7 +130,7 @@ const JobTitleList = ({ value, onChange }) => {
                         <span
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleDeleteDeptmnt(title)
+                            handleDeleteTitle(title)
                           }}
                           className="absolute right-4 text-[#FC5A5A] hover:bg-[#FC5A5A] hover:text-white transition-all p-2.5 rounded-full"
                         >

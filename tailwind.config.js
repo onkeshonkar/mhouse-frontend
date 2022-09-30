@@ -16,6 +16,9 @@ module.exports = {
         "x-grey": "#92929D",
         "x-silver": "#B5B5BE",
       },
+      spacing: {
+        laptop: "85.375rem",
+      },
       maxWidth: {
         "8xl": "85.375rem",
       },

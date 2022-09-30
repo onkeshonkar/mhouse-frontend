@@ -8,7 +8,7 @@ const ListInput = ({ options, value, onChange, placeholder }) => {
       <Listbox value={value} onChange={onChange}>
         {({ open }) => (
           <>
-            <Listbox.Button className="flex w-full justify-between bg-inherit rounded-2xl text-sm px-6 pb-0 pt-3">
+            <Listbox.Button className="flex w-full justify-between bg-inherit rounded-2xl text-sm px-6 pb-0 pt-3 outline-none">
               <span>{value || placeholder}</span>
               <Chevron
                 className={`${

@@ -26,7 +26,7 @@ const RadioInput = ({ options, value, onChange, label }) => {
                   checked
                     ? "bg-accent text-white"
                     : " bg-background text-primary",
-                  " flex px-6 py-4 text-sm cursor-pointer rounded-2xl"
+                  " flex px-6 py-3.5 text-sm cursor-pointer rounded-2xl"
                 )}
               >
                 {option}
