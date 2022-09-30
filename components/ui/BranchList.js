@@ -16,13 +16,10 @@ const BranchList = ({ value, onChange, isDarkMode }) => {
   const { data, error } = useSWR(
     `/v1/restaurents/${selectedBranch.restaurent}/branches?details=semi`,
     fetcher,
-    { revalidateOnFocus: true, errorRetryCount: 3 }
+    {
+      errorRetryCount: 1,
+    }
   )
-
-  const handleOnChange = (branch) => {
-    setVisibleBranch(branch)
-    onChange(branch)
-  }
 
   useEffect(() => {
     if (data) {
@@ -50,7 +47,7 @@ const BranchList = ({ value, onChange, isDarkMode }) => {
 
   return (
     <div className="w-full relative">
-      <Listbox value={visibleBranch} onChange={handleOnChange}>
+      <Listbox value={visibleBranch} onChange={onChange}>
         {({ open }) => (
           <>
             <Listbox.Button

@@ -20,7 +20,10 @@ const JobTitleList = ({ value, onChange }) => {
 
   const { data, error, mutate } = useSWR(
     `/v1/branches/${selectedBranch.id}/job-titles`,
-    fetcher
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
   )
   const filteredJobTitles =
     query === ""

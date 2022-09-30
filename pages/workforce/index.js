@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 import toast from "react-hot-toast"
 
 import { Plus, Edit, Delete, Filter } from "../../components/icons"
@@ -11,15 +11,16 @@ import { fetcher } from "../../lib/axios"
 import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
 import AddEmpModal from "../../components/workforce/modals/AddEmpModal"
+import EditEmpModal from "../../components/workforce/modals/EditEmpModal"
 
 const Workforce = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
   const [isAddEmpModal, setIsAddEmpModal] = useState(false)
   const [isEditEmpModal, setIsEditEmpModal] = useState(false)
-  const [empTomodify, setEmpToModify] = useState()
+  const [empToModify, setEmpToModify] = useState()
 
-  const { data, error, mutate } = useSWR(
+  const { data, error, mutate } = useSWRImmutable(
     `/v1/branches/${selectedBranch.id}/employees`,
     fetcher
   )
@@ -29,10 +30,16 @@ const Workforce = () => {
     const emp = data.employees.find((p) => p.id === clickedEmpId)
     setEmpToModify(emp)
     setIsEditEmpModal(true)
-    console.log(emp)
   }
 
-  if (error) return toast.error(JSON.stringify(error))
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      toast.error(JSON.stringify(error))
+      return <span>{"Can't fetch Job-Titles"}</span>
+    }
+  }
 
   if (!data)
     return (
@@ -47,7 +54,22 @@ const Workforce = () => {
   return (
     <>
       {isAddEmpModal && (
-        <AddEmpModal onCancel={() => setIsAddEmpModal(false)} />
+        <AddEmpModal
+          onCancel={() => {
+            setIsAddEmpModal(false)
+            mutate()
+          }}
+        />
+      )}
+
+      {isEditEmpModal && (
+        <EditEmpModal
+          onCancel={() => {
+            setIsEditEmpModal(false)
+            mutate()
+          }}
+          emp={empToModify}
+        />
       )}
 
       <div className="mt-8 ml-6">
@@ -226,12 +248,7 @@ const Workforce = () => {
                     </td>
 
                     <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                      <button
-                        name={employee.id}
-                        onClick={(e) => {
-                          console.log(e.currentTarget.name)
-                        }}
-                      >
+                      <button name={employee.id} onClick={onEditEmp}>
                         <Edit width={20} height={20} />
                       </button>
                     </td>

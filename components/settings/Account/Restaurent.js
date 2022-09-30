@@ -8,7 +8,7 @@ import Button from "../../ui/Button"
 import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 import { useState } from "react"
-import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 
 const schema = z
   .object({
@@ -23,7 +23,7 @@ const Restaurent = () => {
   const user = useUserStore((store) => store.user)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  const { data, error, mutate } = useSWR(
+  const { data, error, mutate } = useSWRImmutable(
     `/v1/restaurents/${selectedBranch.restaurent}`,
     fetcher
   )

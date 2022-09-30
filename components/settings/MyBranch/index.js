@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 
 import { Plus, Edit, Delete } from "../../icons"
 import Button from "../../ui/Button"
@@ -19,7 +19,7 @@ const MyBranch = () => {
 
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  const { data, error, mutate } = useSWR(
+  const { data, error, mutate } = useSWRImmutable(
     `/v1/restaurents/${selectedBranch.restaurent}/branches?manager=true`,
     fetcher
   )

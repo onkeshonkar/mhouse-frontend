@@ -16,7 +16,10 @@ const PayrollGroups = ({ payrollGroup, onChange }) => {
 
   const { data, error } = useSWR(
     `/v1/branches/${selectedBranch.id}/payroll-groups`,
-    fetcher
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
   )
 
   const handleOnChange = (payrollGroup) => {

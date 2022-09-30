@@ -20,7 +20,10 @@ const RoleList = ({ value, onChange }) => {
 
   const { data, error, mutate } = useSWR(
     `/v1/branches/${selectedBranch.id}/roles`,
-    fetcher
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
   )
   const filteredRoles =
     query === ""

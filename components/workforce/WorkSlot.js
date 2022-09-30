@@ -19,7 +19,7 @@ const WorkSlot = ({ onBack, onNext, onCancel }) => {
   )
 
   const updateWorkingHours = (dayIndex, key, time) => {
-    // console.log(dayIndex, key, time)
+    console.log(dayIndex, key, time)
     if (key === "start") {
       workSlot[dayIndex][0] = time
     } else if (key === "end") {

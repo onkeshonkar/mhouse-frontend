@@ -6,8 +6,6 @@ import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 
 import { Plus, Edit, Delete } from "../../icons"
-import Button from "../../ui/Button"
-import ConfirmModal from "../../ui/ConfirmModal"
 import Spinner from "../../ui/Spinner"
 import TeamModal from "./TeamModal"
 

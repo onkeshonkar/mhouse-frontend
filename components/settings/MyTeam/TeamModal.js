@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import toast from "react-hot-toast"
 
-import { Arrow } from "../../icons"
+import { Arrow, Close } from "../../icons"
 import Input from "../../ui/Input"
 import Modal from "../../ui/Modal"
 import Button from "../../ui/Button"
@@ -47,7 +47,10 @@ const TeamModal = ({ onClose, onSubmitTeam, emp }) => {
   }
   return (
     <Modal open={true} setOpen={() => {}} transparent={false}>
-      <div className="max-w-8xl min-h-screen flex flex-col gap-11">
+      <div className="max-w-8xl min-h-screen flex flex-col gap-11 relative">
+        <button onClick={onClose} className="absolute right-0 mt-20">
+          <Close />
+        </button>
         <h2 className="text-4xl font-semibold mt-20">Basic Info For User</h2>
 
         <div className="flex gap-4">

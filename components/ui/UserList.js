@@ -1,5 +1,4 @@
 import { Fragment, useState } from "react"
-import Image from "next/image"
 import useSWR from "swr"
 import { Combobox } from "@headlessui/react"
 
