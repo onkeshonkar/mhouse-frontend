@@ -37,7 +37,7 @@ const Workforce = () => {
       toast.error(error.message)
     } else {
       toast.error(JSON.stringify(error))
-      return <span>{"Can't fetch Job-Titles"}</span>
+      return <span>{"Can't fetch employee list"}</span>
     }
   }
 

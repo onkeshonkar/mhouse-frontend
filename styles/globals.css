@@ -44,6 +44,11 @@
     height: 20px;
     margin-top: -8px;
   }
+
+  * {
+    outline-width: 2px;
+    outline-color: #ffc34a;
+  }
 }
 
 @layer base {
