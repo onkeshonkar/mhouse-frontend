@@ -43,7 +43,7 @@ const Contact = ({ employee }) => {
       phoneNumber: employee.user.phoneNumber,
       email: employee.user.email,
       rPhoneNumber: employee.emergencyContact.phoneNumber,
-      rName: employee.emergencyContact.phoneNumber,
+      rName: employee.emergencyContact.fullName,
       relation: employee.emergencyContact.relation,
     },
   })
@@ -52,6 +52,7 @@ const Contact = ({ employee }) => {
     setLoading(true)
     console.log(data)
     setLoading(false)
+    setEdit(false)
   }
 
   return (
@@ -69,6 +70,7 @@ const Contact = ({ employee }) => {
             {...register("fullAddress")}
             error={errors.fullAddress}
             disabled={!edit}
+            className={`w-72 ${!edit && "bg-inherit"}`}
           />
         </div>
 
@@ -80,6 +82,7 @@ const Contact = ({ employee }) => {
             {...register("email")}
             error={errors.email}
             disabled={!edit}
+            className={`w-72 ${!edit && "bg-inherit"}`}
           />
         </div>
 
@@ -91,6 +94,7 @@ const Contact = ({ employee }) => {
             {...register("phoneNumber")}
             error={errors.phoneNumber}
             disabled={!edit}
+            className={`w-72 ${!edit && "bg-inherit"}`}
           />
         </div>
       </div>
@@ -106,6 +110,7 @@ const Contact = ({ employee }) => {
           {...register("rPhoneNumber")}
           error={errors.rPhoneNumber}
           disabled={!edit}
+          className={`w-72 ${!edit && "bg-inherit"}`}
         />
 
         <Input
@@ -114,6 +119,7 @@ const Contact = ({ employee }) => {
           {...register("rName")}
           error={errors.rName}
           disabled={!edit}
+          className={`w-72 ${!edit && "bg-inherit"}`}
         />
 
         <Input
@@ -122,6 +128,7 @@ const Contact = ({ employee }) => {
           {...register("relation")}
           error={errors.relation}
           disabled={!edit}
+          className={`w-72 ${!edit && "bg-inherit"}`}
         />
       </div>
 
