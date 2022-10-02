@@ -118,7 +118,7 @@ const WeeklySchedule = ({ week }) => {
                 <div className="flex gap-2">
                   {new Array(7).fill("").map((_, i) => {
                     const schedule = emp.schedules.find((sch) => {
-                      return dayjs(sch.scheduledDate).day() === i + 1
+                      return dayjs(sch.scheduledDate).day() === i
                     })
                     return (
                       <div key={i} className="flex gap-1">

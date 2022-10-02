@@ -150,8 +150,8 @@ const DailySchedule = ({ date }) => {
                   {!emp.schedule && (
                     <div className="bg-white w-full flex items-center justify-center rounded-md">
                       {(() => {
-                        const dayIndex = dayjs(date).day() + 1
-                        if (emp.workSlot[dayIndex].length) {
+                        const dayIndex = dayjs(date).day()
+                        if (emp.workSlot[dayIndex]?.length) {
                           return (
                             <AddSchedule
                               workSlot={emp.workSlot[dayIndex]}

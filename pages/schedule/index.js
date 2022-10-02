@@ -10,7 +10,7 @@ const Schedule = () => {
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"))
 
   const week = useMemo(() => {
-    return dayjs(date).day(1).format("YYYY-MM-DD")
+    return dayjs(date).day(0).format("YYYY-MM-DD")
   }, [date])
 
   const [unPublished, setUnPublished] = useState(false)
