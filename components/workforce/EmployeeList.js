@@ -25,10 +25,14 @@ const EmployeeList = ({ empId }) => {
       errorRetryCount: 2,
     }
   )
+  if (error) return toast.error(JSON.stringify(error))
 
-  if (!data) return null
-
-  if (error) return <span>{JSON.stringify(error)}</span>
+  if (!data)
+    return (
+      <div className="text-center">
+        <Spinner />
+      </div>
+    )
 
   const emps = data.employees
 
@@ -38,15 +42,6 @@ const EmployeeList = ({ empId }) => {
       : emps.filter((emp) => {
           return emp.user.fullName.toLowerCase().includes(query.toLowerCase())
         })
-
-  if (error) return toast.error(JSON.stringify(error))
-
-  if (!data)
-    return (
-      <div className="text-center">
-        <Spinner />
-      </div>
-    )
 
   return (
     <div className="flex flex-col gap-4 items-start">

@@ -23,9 +23,9 @@ const timeDifference = (startTime, endTime) => {
   let end = dayjs(todaysDate + ` ${endTime}`)
 
   let diff = end.diff(start)
-  let totalMinutes = dayjs.duration(diff).asHours()
+  let totalHours = dayjs.duration(diff).asHours()
 
-  return totalMinutes
+  return totalHours
 }
 
 export default timeDifference
