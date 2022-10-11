@@ -2,13 +2,13 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import toast from "react-hot-toast"
+import useSWRImmutable from "swr/immutable"
 
 import Input from "../../ui/Input"
 import Button from "../../ui/Button"
 import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 import { useState } from "react"
-import useSWRImmutable from "swr/immutable"
 
 const schema = z
   .object({

@@ -1,7 +1,10 @@
 import dayjs from "dayjs"
+import Link from "next/link"
 import { useState } from "react"
+import toast from "react-hot-toast"
 import useSWR from "swr"
 import { Draft, Filter, Plus, Report } from "../../components/icons/"
+import AddTaskModal from "../../components/task/AddTaskModal"
 import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
 import Spinner from "../../components/ui/Spinner"
@@ -22,7 +25,7 @@ const Tasks = () => {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      toast.error(JSON.stringify(error))
+      // toast.error(JSON.stringify(error))
       return <span>{"Can't fetch employee list"}</span>
     }
   }
@@ -41,6 +44,8 @@ const Tasks = () => {
 
   return (
     <>
+      {isAddTask && <AddTaskModal onCancel={() => setIsAddTask(false)} />}
+
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
           <div>
@@ -138,9 +143,13 @@ const Tasks = () => {
             <tbody className="bg-white">
               {tasks.map((task) => (
                 <tr key={task.id}>
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {task.title}
-                  </td>
+                  <Link href={`/tasks/${task.id}`} prefetch={false}>
+                    <a>
+                      <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                        {task.title}
+                      </td>
+                    </a>
+                  </Link>
 
                   <td
                     className={`${
