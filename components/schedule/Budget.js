@@ -50,7 +50,7 @@ const Budget = ({ week }) => {
                   </p>
                 </div>
 
-                <button
+                {/* <button
                   onClick={updateBudget}
                   name={i}
                   className=" bg-x-green bottom-3 text-white p-0.5 rounded-full relative group"
@@ -59,7 +59,7 @@ const Budget = ({ week }) => {
                   <span className="text-sm tracking-wider font-light text-white bg-x-grey px-2 py-1.5 rounded-xl absolute hidden group-hover:block after:content-[''] after:w-2 after:h-2 after:bg-inherit after:absolute after:-bottom-1 after:left-6 after:rotate-45 -top-11 z-40">
                     Update Budget
                   </span>
-                </button>
+                </button> */}
               </div>
 
               <span className="w-full h-1 rounded-lg bg-x-green " />
