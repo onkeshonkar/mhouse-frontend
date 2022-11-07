@@ -1,4 +1,6 @@
 import { Tab } from "@headlessui/react"
+import { ArrowDown } from "../../icons"
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +12,9 @@ import {
   Legend,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
-import { ArrowDown } from "../components/icons"
+import TodaysTask from "../TodaysTask"
+import ProfitGraph from "../admin/ProfitGraph"
+import Roster from "./Roster"
 
 ChartJS.register(
   CategoryScale,
@@ -132,48 +136,54 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-const Operations = () => {
+const StaffDashBoard = () => {
   const graphTypes = ["Daily", "Weekly", "Monthly"]
   return (
-    <div className="mt-8 ml-6">
-      <div className="bg-white px-4 py-2 rounded-md">
-        {" "}
-        <Tab.Group>
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="font-bold text-2xl">Total Sales</h3>
+    <div>
+      <Roster />
 
-            <Tab.List className="bg-background rounded-md">
-              {graphTypes.map((type) => (
-                <Tab
-                  key={type}
-                  className={({ selected }) =>
-                    classNames(
-                      selected && "bg-primary text-white",
-                      "px-4 py-2 rounded-md text-xs"
-                    )
-                  }
-                >
-                  {type}
-                </Tab>
-              ))}
-            </Tab.List>
-          </div>
+      <div className="flex gap-4 mt-4">
+        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">
+          <TodaysTask />
+        </div>
 
-          <Tab.Panels>
-            <Tab.Panel>
-              <Line options={options} data={dailyData} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Line options={options} data={weeklyData} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Line options={options} data={monthlyData} />
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">
+          <Tab.Group>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold text-2xl">Employee Payroll</h3>
+
+              <Tab.List className="bg-background rounded-md">
+                {graphTypes.map((type) => (
+                  <Tab
+                    key={type}
+                    className={({ selected }) =>
+                      classNames(
+                        selected && "bg-primary text-white",
+                        "px-4 py-2 rounded-md text-xs"
+                      )
+                    }
+                  >
+                    {type}
+                  </Tab>
+                ))}
+              </Tab.List>
+            </div>
+
+            <Tab.Panels>
+              <Tab.Panel>
+                <Line options={options} data={dailyData} />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Line options={options} data={weeklyData} />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Line options={options} data={monthlyData} />
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
+        </div>
       </div>
     </div>
   )
 }
-
-export default Operations
+export default StaffDashBoard

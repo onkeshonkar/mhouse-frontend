@@ -1,4 +1,6 @@
 import { Tab } from "@headlessui/react"
+import { ArrowDown } from "../../icons"
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +12,6 @@ import {
   Legend,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
-import { ArrowDown } from "../components/icons"
 
 ChartJS.register(
   CategoryScale,
@@ -132,48 +133,54 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-const Operations = () => {
+const ProfitGraph = () => {
   const graphTypes = ["Daily", "Weekly", "Monthly"]
   return (
-    <div className="mt-8 ml-6">
-      <div className="bg-white px-4 py-2 rounded-md">
-        {" "}
-        <Tab.Group>
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="font-bold text-2xl">Total Sales</h3>
-
-            <Tab.List className="bg-background rounded-md">
-              {graphTypes.map((type) => (
-                <Tab
-                  key={type}
-                  className={({ selected }) =>
-                    classNames(
-                      selected && "bg-primary text-white",
-                      "px-4 py-2 rounded-md text-xs"
-                    )
-                  }
-                >
-                  {type}
-                </Tab>
-              ))}
-            </Tab.List>
+    <Tab.Group>
+      <div className="flex justify-between items-center mb-5">
+        <div className="flex justify-between ">
+          <div className="flex items-center gap-6">
+            <div>
+              <h3 className="font-bold text-2xl">5,678 $</h3>
+              <span className="font-light text-sm">Total Profit</span>
+            </div>
+            <div className="self-center flex gap-1.5 items-center text-x-green bg-x-green bg-opacity-20 text-sm px-2 py-1 rounded-3xl">
+              <span>3.5%</span>
+              <ArrowDown width={10} height={10} className="rotate-180" />
+            </div>
           </div>
+        </div>
 
-          <Tab.Panels>
-            <Tab.Panel>
-              <Line options={options} data={dailyData} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Line options={options} data={weeklyData} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Line options={options} data={monthlyData} />
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+        <Tab.List className="bg-background rounded-md">
+          {graphTypes.map((type) => (
+            <Tab
+              key={type}
+              className={({ selected }) =>
+                classNames(
+                  selected && "bg-primary text-white",
+                  "px-4 py-2 rounded-md text-xs"
+                )
+              }
+            >
+              {type}
+            </Tab>
+          ))}
+        </Tab.List>
       </div>
-    </div>
+
+      <Tab.Panels>
+        <Tab.Panel>
+          <Line options={options} data={dailyData} />
+        </Tab.Panel>
+        <Tab.Panel>
+          <Line options={options} data={weeklyData} />
+        </Tab.Panel>
+        <Tab.Panel>
+          <Line options={options} data={monthlyData} />
+        </Tab.Panel>
+      </Tab.Panels>
+    </Tab.Group>
   )
 }
 
-export default Operations
+export default ProfitGraph
