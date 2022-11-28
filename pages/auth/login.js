@@ -91,7 +91,7 @@ const Login = () => {
     } catch (error) {
       setLoading(false)
       const { message } = error?.response?.data || error
-      toast.error(message)
+      toast.error(JSON.stringify(error))
       console.log(error)
     }
   }

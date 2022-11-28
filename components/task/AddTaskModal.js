@@ -18,13 +18,7 @@ const AddTaskModal = ({ onCancel }) => {
   }
 
   return (
-    <Modal
-      open={true}
-      setOpen={() => {
-        onCancel()
-      }}
-      transparent={false}
-    >
+    <Modal open={true} setOpen={() => {}} transparent={false}>
       {currPage === 1 && (
         <TaskInfo onCancel={onCancel} onNext={() => setCurrPage(2)} />
       )}

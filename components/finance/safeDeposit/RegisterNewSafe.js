@@ -17,13 +17,7 @@ const RegisterNewSafe = ({ onClose }) => {
   }
 
   return (
-    <Modal
-      open={true}
-      setOpen={() => {
-        onClose()
-      }}
-      transparent={false}
-    >
+    <Modal open={true} setOpen={() => {}} transparent={false}>
       <div className="max-w-8xl min-h-screen flex flex-col relative ">
         <button onClick={onClose} className="absolute right-0 mt-20">
           <Close />

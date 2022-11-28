@@ -115,6 +115,7 @@ const BasicInfo = ({ onBack, onNext, onCancel }) => {
               </button>
             )}
           </div>
+
           <div className="flex flex-col gap-4">
             <Input
               type="text"
@@ -184,6 +185,7 @@ const BasicInfo = ({ onBack, onNext, onCancel }) => {
           />
         </div>
       </div>
+
       <div className="flex items-center justify-between mt-24 w-laptop">
         <Button onClick={onBack} className="bg-primary" gradient={false}>
           <Arrow

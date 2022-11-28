@@ -104,13 +104,7 @@ const AddEmpModal = ({ onCancel }) => {
   }
 
   return (
-    <Modal
-      open={true}
-      setOpen={() => {
-        onCancel()
-      }}
-      transparent={false}
-    >
+    <Modal open={true} setOpen={() => {}} transparent={false}>
       {currentPage === 1 && (
         <BasicInfo
           onBack={onCancel}
