@@ -9,6 +9,7 @@ import TextArea from "../../ui/TextArea"
 
 const RegisterNewSafe = ({ onClose }) => {
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
+  const [comment, setComment] = useState()
   const currencyRef = useRef()
 
   const onSubmit = () => {
@@ -28,7 +29,11 @@ const RegisterNewSafe = ({ onClose }) => {
         </h2>
 
         <div className="flex flex-col items-center gap-20">
-          <TextArea label="Comment (optional)" />
+          <TextArea
+            label="Comment (optional)"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
 
           <CurrencyCount ref={currencyRef} />
         </div>

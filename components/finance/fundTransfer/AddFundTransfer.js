@@ -12,6 +12,7 @@ const methods = ["Cash on Hand", "Bank Deposit"]
 const AddFundTransfer = ({ onClose }) => {
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [method, setMethod] = useState(methods[0])
+  const [comment, setComment] = useState()
   const currencyRef = useRef()
 
   const onSubmit = () => {
@@ -40,7 +41,11 @@ const AddFundTransfer = ({ onClose }) => {
           <div className="flex gap-8">
             <RadioInput onChange={setMethod} value={method} options={methods} />
 
-            <TextArea label="Comment (optional)" />
+            <TextArea
+              label="Comment (optional)"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
           </div>
 
           <CurrencyCount ref={currencyRef} />

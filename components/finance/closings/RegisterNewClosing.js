@@ -11,6 +11,7 @@ import ClosingCount from "./ClosingCount"
 
 const RegisterNewClosing = ({ onClose }) => {
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
+  const [note, setNote] = useState()
   const [currentPage, setCurrentPage] = useState(1)
 
   const currencyRef = useRef()
@@ -86,7 +87,11 @@ const RegisterNewClosing = ({ onClose }) => {
 
             <ClosingCount cash={cash} income={income} setIncome={setIncome} />
 
-            <TextArea label="Write Note Here..." />
+            <TextArea
+              label="Write Note Here..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </div>
         )}
 
