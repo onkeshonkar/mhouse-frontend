@@ -9,7 +9,7 @@ const suppliers = [
   {
     id: 123,
     avatar: "abc",
-    name: "Onkesh",
+    fullName: "Onkesh",
     email: "onkeshkumaronkar@gmail.com",
     portalUrl: "abc.com",
     phone: "+917903123164",
@@ -23,7 +23,7 @@ const suppliers = [
   {
     id: 223,
     avatar: "abc",
-    name: "Onkesh",
+    fullName: "Onkesh",
     email: "onkeshkumaronkar@gmail.com",
     portalUrl: "abc.com",
     phone: "+917903123164",
@@ -37,7 +37,7 @@ const suppliers = [
   {
     id: 323,
     avatar: "abc",
-    name: "Onkesh",
+    fullName: "Onkesh",
     email: "onkeshkumaronkar@gmail.com",
     portalUrl: "abc.com",
     phone: "+917903123164",
@@ -98,7 +98,7 @@ const Supplier = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">{sup.name}</h3>
+                  <h3 className="font-bold text-base">{sup.fullName}</h3>
                   <span className="text-sm opacity-70">{sup.department}</span>
                 </div>
               </div>
