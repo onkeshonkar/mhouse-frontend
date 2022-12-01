@@ -3,6 +3,7 @@ import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import useSWR from "swr"
+
 import { Draft, Filter, Plus, Report } from "../../components/icons/"
 import AddTaskModal from "../../components/task/AddTaskModal"
 import Avatar from "../../components/ui/Avatar"
@@ -143,13 +144,11 @@ const Tasks = () => {
             <tbody className="bg-white">
               {tasks.map((task) => (
                 <tr key={task.id}>
-                  <Link href={`/tasks/${task.id}`} prefetch={false}>
-                    <a>
-                      <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                        {task.title}
-                      </td>
-                    </a>
-                  </Link>
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal transition-all duration-100 hover:text-amber-500 hover:underline ">
+                    <Link href={`/tasks/${task.id}`} prefetch={false}>
+                      <a>{task.title}</a>
+                    </Link>
+                  </td>
 
                   <td
                     className={`${

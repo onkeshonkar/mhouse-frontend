@@ -2,30 +2,22 @@ import { useState } from "react"
 import Image from "next/image"
 
 import { Chevron, Print, Paper } from "../../components/icons"
-import TooltipButton from "../../components/ui/TooltipButton"
 import ListInput from "../../components/ui/ListInput"
 import dayjs from "dayjs"
-
-const departments = ["Dep1", "Dep2"]
+import TooltipButton from "../../components/ui/ToolTipButton"
+import DepartmentList from "../../components/ui/DepartmentList"
 
 const Report = () => {
-  const [department, setDepartment] = useState(departments[0])
+  const [department, setDepartment] = useState()
   const [month, setMonth] = useState(dayjs().format("YYYY-MM-DD"))
+
   return (
     <div className="mt-8 ml-6 mr-4">
       <main>
         <div className="flex justify-between">
           <div className="flex items-center">
-            <div className="bg-white rounded-2xl h-12 relative focus-within:ring-1 flex items-center">
-              <ListInput
-                value={department}
-                options={departments}
-                onChange={setDepartment}
-                placeholder={"Select Department"}
-              />
-              <label className="absolute text-xs opacity-50 left-6 top-1">
-                Department
-              </label>
+            <div className="w-60">
+              <DepartmentList value={department} onChange={setDepartment} />
             </div>
 
             <div className="flex items-center bg-white rounded-2xl px-6 py-3 w-72 gap-6 ml-6">

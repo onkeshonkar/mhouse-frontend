@@ -14,10 +14,10 @@ const Checklist = ({ task }) => {
         }
         return (
           <div
-            key={item.id}
+            key={item._id}
             className={` ${
-              isExpired && "opacity-50"
-            } px-4 py-3 bg-background rounded-xl flex gap-7 `}
+              isExpired ? "opacity-50" : ""
+            } px-4 py-3 bg-background rounded-xl flex gap-7`}
           >
             {!isExpired ? (
               <div

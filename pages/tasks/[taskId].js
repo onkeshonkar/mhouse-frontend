@@ -11,6 +11,10 @@ import TooltipButton from "../../components/ui/ToolTipButton"
 import { fetcher } from "../../lib/axios"
 import useUserStore from "../../stores/useUserStore"
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ")
+}
+
 const Task = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
@@ -65,14 +69,13 @@ const Task = () => {
             </div>
 
             <span
-              className={`${
-                task.status === "open" && "bg-[#FFF9EC] text-accent"
-              } ${task.status === "completed" && "bg-[#EBFBF5] text-x-green"}
-                    ${task.status === "pending" && "bg-[#FFEEEE] text-x-red"}
-                    ${
-                      task.status === "in-progress" &&
-                      "bg-blue-100 text-blue-600"
-                    } px-3 py-1.5 rounded-2xl text-sm font-light self-center`}
+              className={classNames(
+                task.status === "open" && "bg-[#FFF9EC] text-accent",
+                task.status === "completed" && "bg-[#EBFBF5] text-x-green",
+                task.status === "pending" && "bg-[#FFEEEE] text-x-red",
+                task.status === "in-progress" && "bg-blue-100 text-blue-600",
+                " px-3 py-1.5 rounded-2xl text-sm font-light self-center"
+              )}
             >
               {task.status}
             </span>
@@ -109,7 +112,7 @@ const Task = () => {
 
           <div className="flex gap-28 mt-12">
             <div className="flex flex-col gap-1.5 w-40">
-              <span className="text-xs font-light opacity-50">Due Data</span>
+              <span className="text-xs font-light opacity-50">Due Date</span>
               {task.dueDate ? (
                 <span>
                   <Notebook width={16} height={16} className="inline mr-2" />
