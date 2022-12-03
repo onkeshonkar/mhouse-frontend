@@ -3,9 +3,9 @@ import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import useSWR from "swr"
+import AddCateringModal from "../../components/cateringOrders/AddOrderModal"
 
-import { Draft, Filter, Plus, Report } from "../../components/icons/"
-import AddTaskModal from "../../components/task/AddTaskModal"
+import { Filter, Plus, Report } from "../../components/icons/"
 import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
 import Spinner from "../../components/ui/Spinner"
@@ -97,9 +97,9 @@ const CateringOrders = () => {
 
   return (
     <>
-      {/* {isAddCatering && (
-        <AddTaskModal onCancel={() => setIsAddCatering(false)} />
-      )} */}
+      {isAddCatering && (
+        <AddCateringModal onClose={() => setIsAddCatering(false)} />
+      )}
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">

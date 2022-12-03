@@ -237,7 +237,7 @@ const AddCartModal = ({ onClose }) => {
                       </tr>
                     ))}
 
-                  {/* {showSelectedItems &&
+                  {showSelectedItems &&
                     filteredCart.map((cartItem) => {
                       if (cartItem.qty == 0) return
                       return (
@@ -283,7 +283,7 @@ const AddCartModal = ({ onClose }) => {
                           </td>
                         </tr>
                       )
-                    })} */}
+                    })}
                 </tbody>
               </table>
             </div>
