@@ -40,6 +40,7 @@ const OrderDetails = ({ onNext, onBack }) => {
   const [showMenuList, setShowMenuList] = useState(false)
 
   const divRef = useRef()
+  const inputRef = useRef()
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -52,6 +53,11 @@ const OrderDetails = ({ onNext, onBack }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
+  }, [])
+
+  useEffect(() => {
+    inputRef.current.focus()
+    setShowMenuList(true)
   }, [])
 
   const filteredMenu =
@@ -105,6 +111,7 @@ const OrderDetails = ({ onNext, onBack }) => {
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full"
                 onClick={() => setShowMenuList(true)}
+                ref={inputRef}
               />
 
               <Search
