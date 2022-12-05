@@ -1,13 +1,10 @@
-import dayjs from "dayjs"
 import Image from "next/image"
-import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import useSWR from "swr"
 
-import { Draft, Filter, Plus, Report } from "../components/icons/"
-import AddTaskModal from "../components/task/AddTaskModal"
-import Avatar from "../components/ui/Avatar"
+import { Filter, Plus, Report } from "../components/icons/"
+import AddMenuModal from "../components/menuEngineering/AddMenuModal"
 import Button from "../components/ui/Button"
 import Spinner from "../components/ui/Spinner"
 import TooltipButton from "../components/ui/ToolTipButton"
@@ -58,9 +55,7 @@ const MenuEngineering = () => {
 
   return (
     <>
-      {/* {isAddNewMenu && (
-        <AddTaskModal onCancel={() => setIsAddNewMenu(false)} />
-      )} */}
+      {isAddNewMenu && <AddMenuModal onClose={() => setIsAddNewMenu(false)} />}
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
