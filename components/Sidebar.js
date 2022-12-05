@@ -37,7 +37,7 @@ const SideBar = () => {
   const path = `/${route.pathname.split("/")[1]}`
 
   return (
-    <div className="bg-white shadow-right fixed top-24 z-10 pt-4 pb-9 rounded-tr-2xl rounded-br-[60px] group w-16 hover:w-[192px] transition-all duration-200">
+    <div className="bg-white shadow-right fixed top-24 z-10 pt-4 pb-14 rounded-tr-2xl rounded-br-[60px] group w-16 hover:w-[192px] transition-all duration-200">
       <nav className="flex flex-col gap-2.5 px-2.5">
         {navMenu.map((navItem) => (
           <Link key={navItem.name} href={navItem.href} prefetch={false}>
@@ -61,7 +61,7 @@ const SideBar = () => {
         ))}
       </nav>
 
-      <div className="flex flex-col gap-2.5 px-2.5">
+      {/* <div className="flex flex-col gap-2.5 px-2.5">
         <button className="flex justify-center gap-4 group-hover:w-[172px] p-2.5 bg-gradient-to-tr from-[#FF974A] to-[#FFBA42] text-white rounded-xl shadow-md shadow-accent transition-all duration-300">
           <Lock />
           <span className="hidden group-hover:block relative -left-10 group-hover:translate-x-10 transition-all duration-300 ease-in-out">
@@ -74,7 +74,7 @@ const SideBar = () => {
             Add New
           </span>
         </button>
-      </div>
+      </div> */}
     </div>
   )
 }
