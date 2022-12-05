@@ -141,6 +141,9 @@ const OrderDetails = ({ onNext, onBack }) => {
                   </button>
 
                   <span>{menuItem.name}</span>
+                  <span className="text-xs -ml-2 opacity-70 text-x-green">
+                    ( {menuItem.sellPrice} $)
+                  </span>
                 </li>
               ))}
             </ul>
