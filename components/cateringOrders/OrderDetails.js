@@ -135,7 +135,7 @@ const OrderDetails = ({ onNext, onBack }) => {
                   <button
                     name={menuItem.id}
                     onClick={addMenuToCart}
-                    className="text-xs text-x-green font-bold bg-[#EBFEF9] rounded-md p-2 cursor-pointer"
+                    className="text-xs text-white bg-accent font-semibold rounded-md py-1.5 px-2 cursor-pointer"
                   >
                     ADD
                   </button>
