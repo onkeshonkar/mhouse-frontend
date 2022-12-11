@@ -4,10 +4,12 @@ import { useMemo, useState } from "react"
 import { Chevron, Copy, Paper, Print, Report } from "../../components/icons"
 import DailySchedule from "../../components/schedule/DailySchedule"
 import WeeklySchedule from "../../components/schedule/WeeklySchedule"
+import Calender from "../../components/ui/Calender"
 import TooltipButton from "../../components/ui/ToolTipButton"
 
 const Schedule = () => {
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"))
+  const [showCalender, setShowCalender] = useState(false)
 
   const week = useMemo(() => {
     return dayjs(date).day(0).format("YYYY-MM-DD")
@@ -21,26 +23,36 @@ const Schedule = () => {
     <div className="mt-8 ml-6">
       <div className="flex items-center justify-between">
         <div className="flex">
-          <div className="flex items-center justify-between bg-white rounded-2xl px-6 py-3 w-72 gap-6 ml-6">
-            <button
-              onClick={() =>
-                setDate(dayjs(date).subtract(1, "day1").format("YYYY-MM-DD"))
-              }
-            >
-              <Chevron className="text-accent rotate-90" />
-            </button>
+          <div className="relative">
+            <div className="flex items-center justify-between bg-white rounded-2xl px-6 py-3 w-72 gap-6 ml-6">
+              <button
+                onClick={() =>
+                  setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))
+                }
+              >
+                <Chevron className="text-accent rotate-90" />
+              </button>
 
-            <div className="text-sm text-primary font-normal opacity-50 flex">
-              <span>{dayjs(date).format("ddd, D MMM YYYY")}</span>
+              <div
+                role="button"
+                onClick={() => setShowCalender(!showCalender)}
+                className="text-sm text-primary font-normal opacity-50 flex"
+              >
+                <span>{dayjs(date).format("ddd, D MMM YYYY")}</span>
+              </div>
+
+              <button
+                onClick={() =>
+                  setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))
+                }
+              >
+                <Chevron className="text-accent -rotate-90" />
+              </button>
             </div>
 
-            <button
-              onClick={() =>
-                setDate(dayjs(date).add(1, "days").format("YYYY-MM-DD"))
-              }
-            >
-              <Chevron className="text-accent -rotate-90" />
-            </button>
+            {showCalender && (
+              <Calender currentDate={date} setCurrenDate={setDate} />
+            )}
           </div>
 
           <div

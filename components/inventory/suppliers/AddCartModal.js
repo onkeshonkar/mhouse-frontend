@@ -292,11 +292,15 @@ const AddCartModal = ({ onClose }) => {
           <div className="flex flex-col justify-between items-end">
             <div className="flex flex-col gap-6">
               <div>
-                <span className="font-bold text-2xl">{cartAmount} $</span>
+                <span className="font-bold text-2xl text-x-green">
+                  {cartAmount} $
+                </span>
                 <p className="text-sm font-light">Total Cart Value</p>
               </div>
               <div>
-                <span className="font-bold text-2xl">{cartLength}</span>
+                <span className="font-bold text-2xl text-x-green">
+                  {cartLength}
+                </span>
                 <p className="text-sm font-light">Total items</p>
               </div>
             </div>
