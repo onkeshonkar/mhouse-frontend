@@ -39,7 +39,10 @@ const SafeDeposit = () => {
   return (
     <>
       {isAddNewSafe && (
-        <RegisterNewSafe onClose={() => setIsAddNewSafe(false)} />
+        <RegisterNewSafe
+          onClose={() => setIsAddNewSafe(false)}
+          mutate={mutate}
+        />
       )}
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
