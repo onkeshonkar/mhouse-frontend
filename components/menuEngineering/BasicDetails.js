@@ -9,20 +9,20 @@ import { Arrow, Camera } from "../icons"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
-import RadioInput from "../ui/RadioInput"
-import { CateringOrderContext } from "../../context/CateringContext"
 import { menuEngContext } from "../../context/MenuEngContext"
 import ListInput from "../ui/ListInput"
 
 const seasons = ["Winter", "Summer", "Black Friday", "Weekend", "Holidays"]
-const categories = ["Drinks", "Summer", "Black Friday", "Weekend", "Holidays"]
+const categories = ["Drinks", "Appetizers", "Sea Food", "House", "Holidays"]
 
 const schema = z.object({
   menuName: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
   sellingPrice: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: "Must be a valid number",
   }),
-  prepareTime: z.string().min(3, { message: "Invalid Time" }),
+  prepareTime: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
+    message: "Must be a valid duration",
+  }),
 })
 
 const BasicDetails = ({ onNext, onBack }) => {
@@ -159,15 +159,18 @@ const BasicDetails = ({ onNext, onBack }) => {
             <span className="absolute text-sm top-4 right-6">AUD</span>
           </div>
 
-          <Input
-            type="time"
-            label="Preparing Time"
-            autoComplete="prepareTime"
-            className="w-64"
-            defaultValue={menuDetails.prepareTime || ""}
-            {...register("prepareTime")}
-            error={errors.prepareTime}
-          />
+          <div className="relative self-end">
+            <Input
+              type="number"
+              label="Preparing Time"
+              autoComplete="prepareTime"
+              className="w-64"
+              defaultValue={menuDetails.prepareTime || ""}
+              {...register("prepareTime")}
+              error={errors.prepareTime}
+            />
+            <span className="absolute text-sm top-4 right-6">Minutes</span>
+          </div>
         </div>
       </div>
 
