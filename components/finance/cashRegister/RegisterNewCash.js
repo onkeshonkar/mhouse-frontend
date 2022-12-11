@@ -1,4 +1,8 @@
 import { useRef, useState } from "react"
+import { toast } from "react-hot-toast"
+import { APIService } from "../../../lib/axios"
+
+import useUserStore from "../../../stores/useUserStore"
 import { Arrow, Close } from "../../icons"
 import Button from "../../ui/Button"
 import CurrencyCount from "../../ui/CurrencyCount"
@@ -8,14 +12,27 @@ import RadioInput from "../../ui/RadioInput"
 
 const times = ["Breakfast", "Lunch", "Dinner", "Night"]
 
-const RegisterNewCash = ({ onClose }) => {
+const RegisterNewCash = ({ onClose, mutate }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
 
   const [time, setTime] = useState(times[0])
   const currencyRef = useRef()
 
-  const onSubmit = () => {
-    console.log(currencyRef, time)
+  const onSubmit = async () => {
+    const data = { ...currencyRef.current.currency, time }
+    console.log(data)
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/cash-register`,
+        data
+      )
+      toast.success("Cash registered")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
     onClose()
   }
 

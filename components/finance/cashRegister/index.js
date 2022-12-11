@@ -38,7 +38,9 @@ const CashRegister = () => {
 
   return (
     <>
-      {isNewCash && <RegisterNewCash onClose={() => setIsNewCash(false)} />}
+      {isNewCash && (
+        <RegisterNewCash onClose={() => setIsNewCash(false)} mutate={mutate} />
+      )}
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">

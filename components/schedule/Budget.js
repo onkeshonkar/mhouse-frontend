@@ -1,13 +1,46 @@
 import dayjs from "dayjs"
+import { toast } from "react-hot-toast"
+import useSWR from "swr"
+import { fetcher } from "../../lib/axios"
+
+import useUserStore from "../../stores/useUserStore"
 import { Check } from "../icons"
+import Spinner from "../ui/Spinner"
 
 const Budget = ({ week }) => {
+  console.log(week)
   const updateBudget = (e) => {
     const i = e.currentTarget.name
     const date = dayjs(week).add(i, "days").format("YYYY-MM-DD")
     console.log(i)
     console.log(date)
   }
+
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/budgets?date=${week}`,
+    fetcher
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      toast.error(JSON.stringify(error))
+      return <span>{"Can't fetch employee list"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { budgets } = data
+
   return (
     <div className="fixed bottom-0 my-1 flex gap-4 w-full max-w-7xl">
       <div className="w-56 bg-white px-6 pt-4 rounded-md flex flex-col items-center justify-center self-end h-20">
