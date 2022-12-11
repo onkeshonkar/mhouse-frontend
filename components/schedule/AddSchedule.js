@@ -1,19 +1,24 @@
 import { useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
+import { APIService } from "../../lib/axios"
+import useUserStore from "../../stores/useUserStore"
 
 import { Plus, Clock, Check } from "../icons"
+import Button from "../ui/Button"
 import RadioInput from "../ui/RadioInput"
 
 const leaveTypes = ["Annual Leave", "Unpaid Leave", "Sick Leave"]
 
-const AddSchedule = ({ workSlot, date, employeeId }) => {
+const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+
   const [breakTime, setBreakTime] = useState("0")
   const [startTime, setStartTime] = useState(workSlot[0])
   const [endTime, setEndTime] = useState(workSlot[1])
-
   const [mode, setMode] = useState("work")
-
   const [leaveType, setLeaveType] = useState()
+
+  const [loading, setLoading] = useState(false)
 
   const [openAddwokModal, setOpenworkmodal] = useState(false)
   const divRef = useRef()
@@ -31,13 +36,40 @@ const AddSchedule = ({ workSlot, date, employeeId }) => {
     }
   }, [])
 
-  const addSchedule = async () => {}
+  const addSchedule = async () => {
+    if (startTime >= endTime) {
+      return toast.error("Start Time must be smaller")
+    }
+    setLoading(true)
+
+    const scheduleData = { employee: employeeId, scheduledDate: date }
+    if (mode === "leave") {
+      scheduleData.leaveType = leaveType
+    } else {
+      scheduleData.scheduledSlot = [startTime, endTime]
+      scheduleData.breakTime = breakTime
+    }
+
+    try {
+      const res = await APIService.post(
+        `/v1/branches/${selectedBranch.id}/schedules`,
+        scheduleData
+      )
+      setLoading(false)
+      setOpenworkmodal(false)
+      toast.success("Roster added")
+      return reloadSchedule()
+    } catch (error) {
+      toast.error(error.response.data.message)
+      setLoading(false)
+    }
+  }
 
   if (!workSlot.length)
     return (
-      <div className="flex items-center">
-        <span className="w-1 h-1 bg-red-600 mr-1 rounded-full text-xs opacity-90" />
-        unavailable
+      <div className="flex items-center opacity-70">
+        <span className="mt-1 w-1 h-1 bg-red-600 mr-1 rounded-full text-xs" />
+        <span>unavailable</span>
       </div>
     )
 
@@ -135,15 +167,10 @@ const AddSchedule = ({ workSlot, date, employeeId }) => {
               />
             </div>
 
-            <div
-              onClick={addSchedule}
-              role="button"
-              className="mx-auto text-accent hover:text-white rounded-2xl flex items-center gap-1 ring-1 ring-accent py-2 px-3 justify-center hover:bg-accent transition-all duration-150"
-            >
-              Add roster
-              <span></span>
-              <Check width={14} height={14} />
-            </div>
+            <Button onClick={addSchedule} loading={loading}>
+              <span>Add roster</span>
+              <Check width={14} height={14} className="ml-2" />
+            </Button>
           </div>
         </div>
       )}

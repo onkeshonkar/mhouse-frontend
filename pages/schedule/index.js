@@ -15,7 +15,7 @@ const Schedule = () => {
     return dayjs(date).day(0).format("YYYY-MM-DD")
   }, [date])
 
-  const [unPublished, setUnPublished] = useState(false)
+  const [unPublished, setUnPublished] = useState(true)
 
   const [showToday, setShowToday] = useState(false)
 

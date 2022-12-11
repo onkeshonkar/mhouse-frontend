@@ -133,6 +133,7 @@ const WeeklySchedule = ({ week }) => {
                                 date={dayjs(dayjs(week).add(i, "day")).format(
                                   "YYYY-MM-DD"
                                 )}
+                                reloadSchedule={mutate}
                               />
                             )}
                           </div>

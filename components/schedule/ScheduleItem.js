@@ -12,15 +12,29 @@ const ScheduleItem = ({ schedule }) => {
       {mode === "schedule" && (
         <div onClick={() => setMode("delete")}>
           {schedule.scheduledSlot.length ? (
-            <div className="flex flex-col items-center justify-between">
+            <div className="flex flex-col items-center justify-between py-2 text-xs font-semibold">
               <span>{schedule.scheduledSlot[0]}</span>
               <span>-</span>
               <span>{schedule.scheduledSlot[1]}</span>
             </div>
           ) : (
-            <span className='className="text-xs text-primary font-normal'>
-              {schedule.leaveType}
-            </span>
+            <>
+              {schedule.leaveType === "Unpaid Leave" && (
+                <span className="bg-[#EBFBF5] text-x-green px-3 py-1.5 rounded-3xl">
+                  {schedule.leaveType}
+                </span>
+              )}
+              {schedule.leaveType === "Annual Leave" && (
+                <span className="bg-[#FFF9EC] text-accent px-3 py-1.5 rounded-3xl">
+                  {schedule.leaveType}
+                </span>
+              )}
+              {schedule.leaveType === "Sick Leave" && (
+                <span className="bg-[#FFEEEE] text-x-red px-3 py-1.5 rounded-3xl">
+                  {schedule.leaveType}
+                </span>
+              )}
+            </>
           )}
         </div>
       )}

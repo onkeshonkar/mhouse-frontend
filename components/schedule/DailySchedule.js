@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { useState } from "react"
+import { toast } from "react-hot-toast"
 import useSWR from "swr"
 
 import { fetcher } from "../../lib/axios"
@@ -26,7 +27,7 @@ const timings = [
   "06:00",
 ]
 
-const DailySchedule = ({ date }) => {
+const DailySchedule = ({ date, setUnPublished }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [query, setQuery] = useState("")
 
@@ -52,6 +53,7 @@ const DailySchedule = ({ date }) => {
     )
 
   const emps = data.employees
+  setUnPublished(data.unPublishedSchedule)
 
   const filteredEmps =
     query === ""
@@ -114,8 +116,21 @@ const DailySchedule = ({ date }) => {
                 <div className="flex flex-grow">
                   {emp.schedule?.leaveType && (
                     <div className="bg-white flex items-center justify-center rounded-md w-full">
-                      <span className="w-1 h-1 bg-x-green mr-3 rounded-full text-xs opacity-90" />
-                      <span className="text-sm">{emp.schedule.leaveType}</span>
+                      {emp.schedule.leaveType === "Unpaid Leave" && (
+                        <span className="bg-[#EBFBF5] text-x-green px-3 py-1.5 rounded-3xl">
+                          {emp.schedule.leaveType}
+                        </span>
+                      )}
+                      {emp.schedule.leaveType === "Annual Leave" && (
+                        <span className="bg-[#FFF9EC] text-accent px-3 py-1.5 rounded-3xl">
+                          {emp.schedule.leaveType}
+                        </span>
+                      )}
+                      {emp.schedule.leaveType === "Sick Leave" && (
+                        <span className="bg-[#FFEEEE] text-x-red px-3 py-1.5 rounded-3xl">
+                          {emp.schedule.leaveType}
+                        </span>
+                      )}
                     </div>
                   )}
 
@@ -156,14 +171,15 @@ const DailySchedule = ({ date }) => {
                               workSlot={emp.workSlot[dayIndex]}
                               employeeId={emp.id}
                               date={date}
+                              reloadSchedule={mutate}
                             />
                           )
                         }
 
                         return (
-                          <div className="flex items-center">
-                            <span className="w-1 h-1 bg-x-red mr-3 rounded-full text-xs opacity-90" />
-                            <span className="text-sm">Unavaible</span>
+                          <div className="flex items-center opacity-70">
+                            <span className="w-1 h-1 bg-x-red mr-3 rounded-full text-xs " />
+                            <span className="text-sm">unavaible</span>
                           </div>
                         )
                       })()}
