@@ -1,4 +1,8 @@
 import { useRef, useState } from "react"
+import { toast } from "react-hot-toast"
+import { APIService } from "../../../lib/axios"
+
+import useUserStore from "../../../stores/useUserStore"
 import { Arrow, Close } from "../../icons"
 import Button from "../../ui/Button"
 import CurrencyCount from "../../ui/CurrencyCount"
@@ -9,14 +13,26 @@ import TextArea from "../../ui/TextArea"
 
 const methods = ["Cash on Hand", "Bank Deposit"]
 
-const AddFundTransfer = ({ onClose }) => {
+const AddFundTransfer = ({ onClose, mutate }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [method, setMethod] = useState(methods[0])
   const [comment, setComment] = useState()
   const currencyRef = useRef()
 
-  const onSubmit = () => {
-    console.log(currencyRef, method)
+  const onSubmit = async () => {
+    const data = { amount: currencyRef.current.totalCash, comment, method }
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/fund-transfers`,
+        data
+      )
+      toast.success("Transfer added!")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
     onClose()
   }
 

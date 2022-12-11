@@ -1,8 +1,9 @@
 import dayjs from "dayjs"
 import { useState } from "react"
+import { toast } from "react-hot-toast"
 import useSWRImmutable from "swr/immutable"
 
-import { fetcher } from "../../../lib/axios"
+import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 import { Check, Close, Filter, Paper, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
@@ -16,17 +17,37 @@ const FundTransfer = () => {
 
   const [isAddNewTransfer, setIsAddNewTransfer] = useState(false)
 
-  const approveTransfer = (e) => {
-    console.log(e.currentTarget.name)
-  }
-  const cancelTransfer = (e) => {
-    console.log(e.currentTarget.name)
-  }
-
   const { data, error, mutate } = useSWRImmutable(
     `/v1/branches/${selectedBranch.id}/fund-transfers`,
     fetcher
   )
+
+  const approveTransfer = async (e) => {
+    const transferId = e.currentTarget.name
+    try {
+      await APIService.patch(
+        `/v1/branches/${selectedBranch.id}/fund-transfers/${transferId}`,
+        { status: "Approved" }
+      )
+      toast.success("Transfer status updated.")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
+  }
+  const cancelTransfer = async (e) => {
+    const transferId = e.currentTarget.name
+    try {
+      await APIService.patch(
+        `/v1/branches/${selectedBranch.id}/fund-transfers/${transferId}`,
+        { status: "Canceled" }
+      )
+      toast.success("Transfer status updated.")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
@@ -47,7 +68,10 @@ const FundTransfer = () => {
   return (
     <>
       {isAddNewTransfer && (
-        <AddFundTransfer onClose={() => setIsAddNewTransfer(false)} />
+        <AddFundTransfer
+          onClose={() => setIsAddNewTransfer(false)}
+          mutate={mutate}
+        />
       )}
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
