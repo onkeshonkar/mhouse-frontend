@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { toast } from "react-hot-toast"
 
 import { Plus, Clock, Check } from "../icons"
 import RadioInput from "../ui/RadioInput"
@@ -54,7 +55,7 @@ const AddSchedule = ({ workSlot, date, employeeId }) => {
 
       {openAddwokModal && (
         <div
-          className="bg-white z-20 p-6 absolute rounded-md shadow-xl w-[480px] h-[360px]"
+          className="bg-white z-20 p-6 absolute rounded-xl shadow-xl w-[480px] h-[360px]"
           ref={divRef}
         >
           <span className="text-xs mb-1 flex justify-center">
@@ -137,9 +138,11 @@ const AddSchedule = ({ workSlot, date, employeeId }) => {
             <div
               onClick={addSchedule}
               role="button"
-              className="bg-[#3DD598] mx-auto h-9 w-9 rounded-lg flex items-center justify-center  hover:bg-accent transition-all duration-150"
+              className="mx-auto text-accent hover:text-white rounded-2xl flex items-center gap-1 ring-1 ring-accent py-2 px-3 justify-center hover:bg-accent transition-all duration-150"
             >
-              <Check width={16} height={16} className="text-white -m-1" />
+              Add roster
+              <span></span>
+              <Check width={14} height={14} />
             </div>
           </div>
         </div>
