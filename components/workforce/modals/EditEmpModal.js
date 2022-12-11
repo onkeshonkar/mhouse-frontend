@@ -75,20 +75,25 @@ const EditEmpModal = ({ onCancel, emp }) => {
     setLoading(true)
 
     if (!department) {
-      return toast.error("Select department")
+      toast.error("Select department")
+      return setLoading(false)
     }
     if (!jobTitle) {
-      return toast.error("Select JobTitle")
+      toast.error("Select JobTitle")
+      return setLoading(false)
     }
     if (!tenure.duration) {
-      return toast.error("Enter Tenure duration")
+      toast.error("Enter Tenure duration")
+      return setLoading(false)
     }
     if (!payrollGroup) {
-      return toast.error("Select Payroll group")
+      toast.error("Select Payroll group")
+      return setLoading(false)
     }
 
     if (visaTypes.slice(0, 3).includes(visa.type) && !visa.expiryDate) {
-      return toast.error("Visa expiry required")
+      toast.error("Visa expiry required")
+      return setLoading(false)
     }
 
     let inValidTime = false
@@ -102,7 +107,7 @@ const EditEmpModal = ({ onCancel, emp }) => {
       }
     })
 
-    if (inValidTime) return
+    if (inValidTime) return setLoading(false)
 
     try {
       await APIService.patch(
