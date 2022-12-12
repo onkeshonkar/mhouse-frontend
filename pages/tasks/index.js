@@ -38,14 +38,18 @@ const Tasks = () => {
       </div>
     )
 
-  const todaysTasks = 26
-  const completeTaks = 10
-
-  const tasks = data.tasks
+  const { tasks } = data
+  const todaysTasks = tasks.length
+  const completeTaks = tasks.reduce((prevVal, currVal) => {
+    if (currVal.status === "completed") return prevVal + 1
+    return prevVal
+  }, 0)
 
   return (
     <>
-      {isAddTask && <AddTaskModal onCancel={() => setIsAddTask(false)} />}
+      {isAddTask && (
+        <AddTaskModal onCancel={() => setIsAddTask(false)} mutate={mutate} />
+      )}
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
@@ -57,11 +61,11 @@ const Tasks = () => {
           <div className="flex gap-4 items-center">
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-normal">Employees Working Today</p>
+                <p className="text-xs font-normal">Todays task</p>
                 <div className="text-base font-bold">
-                  <span className="text-x-green">{todaysTasks}</span>
+                  <span className="text-x-green">{completeTaks}</span>
                   <span> / </span>
-                  <span>{completeTaks}</span>
+                  <span>{todaysTasks}</span>
                 </div>
               </div>
 
@@ -115,7 +119,7 @@ const Tasks = () => {
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Completed Date
                 </th>
@@ -127,14 +131,14 @@ const Tasks = () => {
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Completed By
                 </th>
 
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Status
                 </th>
@@ -155,7 +159,7 @@ const Tasks = () => {
                       !task.checkList.length && "opacity-50"
                     } whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal`}
                   >
-                    <span className="flex gap-1">
+                    <span className="flex gap-1 h-9 items-center">
                       <Draft width={18} height={18} />
                       {task.checkList.length}
                     </span>
@@ -165,7 +169,7 @@ const Tasks = () => {
                     {dayjs(task.dueDate).format("DD MMM YYYY")}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center">
                     {task.completedDate ? (
                       <span className="text-x-green">
                         {dayjs(task.completedDate).format("DD MMM YYYY")}
@@ -175,13 +179,13 @@ const Tasks = () => {
                     )}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal">
                     {task.department}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {task.completedBy && (
-                      <div className="flex items-center gap-4">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center">
+                    {task.completedBy ? (
+                      <div className="flex items-center justify-center gap-4">
                         <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
                           <Avatar
                             user={task.completedBy}
@@ -191,10 +195,12 @@ const Tasks = () => {
                         </div>
                         {task.completedBy.fullName}
                       </div>
+                    ) : (
+                      "----"
                     )}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center">
                     <span
                       className={`${
                         task.status === "open" && "bg-[#FFF9EC] text-accent"

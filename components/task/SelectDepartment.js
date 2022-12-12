@@ -29,7 +29,7 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
     if (isRepeatType && repeatType === "Monthly" && !repeateDate) {
       return toast.error("Select repeat Date")
     }
-    updateTask({
+    await updateTask({
       departments,
       isRepeatType,
       ...(isRepeatType && { repeatType }),

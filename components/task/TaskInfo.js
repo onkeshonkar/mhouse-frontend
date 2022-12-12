@@ -60,9 +60,7 @@ const TaskInfo = ({ onNext, onCancel }) => {
         />
 
         <div className=" flex flex-col gap-4 mt-7 ">
-          <h2 className="text-base font-semibold self-start">
-            Checklists (optional)
-          </h2>
+          <h2 className="text-base font-semibold self-start">Checklists</h2>
 
           {checkList.map((item, i) => (
             <AddChecklistItem

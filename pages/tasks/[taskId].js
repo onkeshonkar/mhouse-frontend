@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { useRouter } from "next/router"
+import { toast } from "react-hot-toast"
 import useSWR from "swr"
 import { Delete, Draft, Notebook } from "../../components/icons"
 import Checklist from "../../components/task/Checklist"
@@ -8,7 +9,7 @@ import Button from "../../components/ui/Button"
 
 import Spinner from "../../components/ui/Spinner"
 import TooltipButton from "../../components/ui/ToolTipButton"
-import { fetcher } from "../../lib/axios"
+import { APIService, fetcher } from "../../lib/axios"
 import useUserStore from "../../stores/useUserStore"
 
 function classNames(...classes) {
@@ -39,6 +40,19 @@ const Task = () => {
     }
   }
 
+  const onDelete = async () => {
+    try {
+      await APIService.delete(
+        `/v1/branches/${selectedBranch.id}/tasks/${taskId}`
+      )
+      toast.success("task deleted")
+      route.back()
+      mutate()
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+  }
+
   if (!data)
     return (
       <div className="mt-10 text-center">
@@ -53,7 +67,7 @@ const Task = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-medium">{task.title}</h1>
 
-        <TooltipButton text={"Delete"} className="bg-x-red">
+        <TooltipButton text={"Delete"} className="bg-x-red" onClick={onDelete}>
           <Delete className="text-white" />
         </TooltipButton>
       </div>
@@ -93,7 +107,7 @@ const Task = () => {
           </div>
 
           <div className="mt-6">
-            <Checklist task={task} />
+            <Checklist task={task} mutate={mutate} />
           </div>
         </div>
 
