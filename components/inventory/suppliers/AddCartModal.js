@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Arrow, Check, Close, Search } from "../../icons"
 import Button from "../../ui/Button"
@@ -6,67 +6,53 @@ import Modal from "../../ui/Modal"
 import useSupplierStore from "../../../stores/useSupplierStore"
 import Input from "../../ui/Input"
 import RadioInput from "../../ui/RadioInput"
+import useSWR from "swr"
+import useUserStore from "../../../stores/useUserStore"
+import Spinner from "../../ui/Spinner"
+import { toast } from "react-hot-toast"
+import { APIService, fetcher } from "../../../lib/axios"
 
-const items = [
-  {
-    id: 12,
-    item: "Burger",
-    unit: "Piece",
-    price: 10,
-    minStock: "120",
-    inHand: "130",
-  },
-  {
-    id: 13,
-    item: "Tomato",
-    unit: "kg",
-    price: 10,
-    minStock: "10.00",
-    inHand: "18",
-  },
-  {
-    id: 14,
-    item: "Meat",
-    unit: "kg",
-    price: 10,
-    minStock: "10.00",
-    inHand: "10",
-  },
-  {
-    id: 15,
-    item: "Besan",
-    unit: "kg",
-    price: 18,
-    minStock: "100",
-    inHand: "112",
-  },
-  {
-    id: 16,
-    item: "Sauce",
-    unit: "kg",
-    price: 179,
-    minStock: "5.00",
-    inHand: "18",
-  },
-]
+const paymentMethods = ["Cash", "Eftpos", "Credit"]
 
-const paymentTypes = ["Cash", "Eftpos", "Credit"]
+const AddCartModal = ({ onClose, supplier, mutateOrder }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-const AddCartModal = ({ onClose }) => {
   const [query, setQuery] = useState("")
   const [showSelectedItems, setShowSelectedItem] = useState(false)
-  const [paymentType, setPaymentType] = useState(paymentTypes[0])
+  const [paymentMethod, setPaymentMethod] = useState(paymentMethods[0])
   const [upfront, setUpfront] = useState(0)
-  const [cart, setCart] = useState([
-    ...items.map((item) => ({ ...item, qty: 0 })),
-  ])
+  const [cart, setCart] = useState([])
+
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/stocktakes`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
+
+  useEffect(() => {
+    if (data)
+      setCart([
+        ...data.stocktake.map((product) => ({
+          // ...product,
+          item: product.item,
+          unit: product.unit,
+          price: product.price,
+          stocktakeId: product.id,
+          minStock: product.minStock,
+          currentStock: product.currentStock,
+          quantity: 0,
+        })),
+      ])
+  }, [data])
 
   const cartAmount = cart.reduce((acc, cartItem) => {
-    return acc + cartItem.price * cartItem.qty
+    return acc + cartItem.price * cartItem.quantity
   }, 0)
 
   const cartLength = cart.reduce((acc, cartItem) => {
-    return acc + (cartItem.qty > 0 ? 1 : 0)
+    return acc + (cartItem.quantity > 0 ? 1 : 0)
   }, 0)
 
   const filteredCart =
@@ -76,9 +62,42 @@ const AddCartModal = ({ onClose }) => {
           return c.item.toLowerCase().includes(query.toLowerCase())
         })
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const data = {
+      upfrontPayment: upfront,
+      orderItems: cart,
+      paymentMethod,
+      supplier,
+    }
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/suppliers/orders`,
+        data
+      )
+      toast.success("Order created")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutateOrder()
     onClose()
   }
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error("Network Error")
+    } else {
+      return (
+        <span className="mt-4 block text-center">{`something went wrong`}</span>
+      )
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
 
   return (
     <Modal open={true} setOpen={() => {}} transparent={false}>
@@ -153,37 +172,37 @@ const AddCartModal = ({ onClose }) => {
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       Unit
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       Qty
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       Price
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       Total Price
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       Min Stock
                     </th>
                     <th
                       scope="col"
-                      className="text-sm text-primary font-normal text-left px-5 py-2"
+                      className="text-sm text-primary font-normal px-5 py-2"
                     >
                       In Hand
                     </th>
@@ -193,28 +212,28 @@ const AddCartModal = ({ onClose }) => {
                 <tbody>
                   {!showSelectedItems &&
                     filteredCart.map((cartItem) => (
-                      <tr key={cartItem.id}>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
+                      <tr key={cartItem.stocktakeId}>
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal text-left">
                           {cartItem.item}
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal">
                           {cartItem.unit}
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal">
                           <input
-                            type={"number"}
+                            key={cartItem.stocktakeId}
+                            type={"Number"}
                             className="block text-center w-16 px-5 py-2.5 text-sm bg-background outline-none focus:ring-2 ring-accent rounded-2xl"
-                            value={cartItem.qty}
+                            value={cartItem.quantity}
                             onChange={(e) => {
-                              const qty = parseInt(e.target.value)
-                              if (isNaN(qty)) return
+                              const quantity = e.target.valueAsNumber || 0
 
                               setCart((prevCart) => {
                                 return prevCart.map((item) => {
-                                  if (item.id == cartItem.id)
+                                  if (item.stocktakeId == cartItem.stocktakeId)
                                     return {
                                       ...item,
-                                      qty,
+                                      quantity,
                                     }
                                   else return { ...item }
                                 })
@@ -222,26 +241,26 @@ const AddCartModal = ({ onClose }) => {
                             }}
                           />
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal">
                           {cartItem.price} $
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
-                          {cartItem.price * cartItem.qty} $
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal">
+                          {cartItem.price * cartItem.quantity} $
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal">
                           {cartItem.minStock} {cartItem.unit}
                         </td>
-                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold ">
-                          {cartItem.inHand} {cartItem.unit}
+                        <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold">
+                          {cartItem.currentStock} {cartItem.unit}
                         </td>
                       </tr>
                     ))}
 
                   {showSelectedItems &&
                     filteredCart.map((cartItem) => {
-                      if (cartItem.qty == 0) return
+                      if (cartItem.quantity == 0) return
                       return (
-                        <tr key={cartItem.id}>
+                        <tr key={cartItem.stocktakeId}>
                           <td className="whitespace-nowrap px-5  py-1 text-sm text-primary font-normal w-28">
                             {cartItem.item}
                           </td>
@@ -250,18 +269,20 @@ const AddCartModal = ({ onClose }) => {
                           </td>
                           <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
                             <input
-                              type={"number"}
+                              type={"Number"}
                               className="block text-center w-16 px-5 py-2.5 text-sm bg-background outline-none focus:ring-2 ring-accent rounded-2xl"
-                              value={cartItem.qty}
+                              value={cartItem.quantity}
                               onChange={(e) => {
-                                const qty = parseInt(e.target.value)
-
+                                const quantity = parseInt(
+                                  e.target.valueAsNumber
+                                )
+                                if (isNaN(quantity)) return
                                 setCart((prevCart) => {
                                   return prevCart.map((item) => {
                                     if (item.id == cartItem.id)
                                       return {
                                         ...item,
-                                        qty: qty > 0 ? qty : 0,
+                                        quantity: quantity > 0 ? quantity : 0,
                                       }
                                     else return { ...item }
                                   })
@@ -273,13 +294,13 @@ const AddCartModal = ({ onClose }) => {
                             {cartItem.price}
                           </td>
                           <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
-                            {cartItem.price * cartItem.qty}
+                            {cartItem.price * cartItem.quantity}
                           </td>
                           <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
                             {cartItem.minStock}
                           </td>
                           <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold ">
-                            {cartItem.inHand}
+                            {cartItem.currentStock} {cartItem.unit}
                           </td>
                         </tr>
                       )
@@ -308,20 +329,20 @@ const AddCartModal = ({ onClose }) => {
             <div className="flex flex-col">
               <div className="relative mb-6 self-end">
                 <Input
-                  type="number"
+                  type="Number"
                   label="Upfront Paid"
                   className="w-56"
                   value={upfront}
-                  onChange={(e) => setUpfront(e.target.value)}
+                  onChange={(e) => setUpfront(e.target.valueAsNumber || 0)}
                 />
                 <span className="absolute text-sm top-4 right-6">AUD</span>
               </div>
 
               <RadioInput
                 label={"Payment Method"}
-                value={paymentType}
-                options={paymentTypes}
-                onChange={setPaymentType}
+                value={paymentMethod}
+                options={paymentMethods}
+                onChange={setPaymentMethod}
               />
             </div>
           </div>

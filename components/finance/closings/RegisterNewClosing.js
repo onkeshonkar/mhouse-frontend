@@ -98,7 +98,7 @@ const RegisterNewClosing = ({ onClose, mutate }) => {
                 type="Number"
                 label="Transaction Count"
                 value={txnCount}
-                onChange={(e) => setTxnCount(e.target.valueAsNumber)}
+                onChange={(e) => setTxnCount(e.target.valueAsNumber || 0)}
               />
 
               <div className="">

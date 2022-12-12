@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
@@ -10,17 +10,14 @@ import Input from "../../ui/Input"
 import RadioInput from "../../ui/RadioInput"
 import TextArea from "../../ui/TextArea"
 import useSupplierStore from "../../../stores/useSupplierStore"
+import { toast } from "react-hot-toast"
 
 const orderMethods = ["Email", "SMS", "Portal", "Link Via SMS"]
 
 const schema = z.object({
-  minOrder: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: "Expected number, received a string",
-  }),
-  deliveryFee: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: "Expected number, received a string",
-  }),
-  instruction: z
+  minOrderValue: z.number().min(1),
+  deliveryFee: z.number().min(0),
+  deliveryInstruction: z
     .string()
     .min(10, { message: "Must be 10 or more char long" })
     .max(200, { message: "Must be 50 or fewer char long" }),
@@ -37,9 +34,20 @@ const Instructions = ({ onNext, onBack }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) })
+    control,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      minOrderValue: supplier.minOrderValue || 0,
+      deliveryFee: supplier.deliveryFee || 0,
+    },
+  })
+
+  // setValue()
 
   const onSubmit = async (data) => {
+    if (!department) return toast.error("Select Department")
     updateSupplier({ ...data, department, orderVia })
     onNext()
   }
@@ -64,25 +72,54 @@ const Instructions = ({ onNext, onBack }) => {
           <DepartmentList value={department} onChange={setDepartment} />
 
           <div className="relative">
-            <Input
-              type="number"
-              label="min order value"
-              className="w-56"
-              defaultValue={supplier.minOrder || 0}
-              {...register("minOrder")}
-              error={errors.minOrder}
+            <Controller
+              name="minOrderValue"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <Input
+                    // type="number"
+                    label="min order value"
+                    className="w-56"
+                    {...field}
+                    value={field.value}
+                    onChange={(e) =>
+                      field.onChange(parseInt(e.target.value) || 0)
+                    }
+                    error={errors.minOrderValue}
+                  />
+                )
+              }}
             />
             <span className="absolute text-sm top-4 right-6">AUD</span>
           </div>
 
           <div className="relative">
-            <Input
+            {/* <Input
               type="number"
               label="Delivery Fees"
               className="w-56"
               defaultValue={supplier.deliveryFee || 0}
               {...register("deliveryFee")}
               error={errors.deliveryFee}
+            /> */}
+            <Controller
+              name="deliveryFee"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <Input
+                    label="Delivery Fees"
+                    className="w-56"
+                    {...field}
+                    value={field.value}
+                    onChange={(e) =>
+                      field.onChange(parseInt(e.target.value) || 0)
+                    }
+                    error={errors.deliveryFee}
+                  />
+                )
+              }}
             />
             <span className="absolute text-sm top-4 right-6">AUD</span>
           </div>
@@ -92,9 +129,9 @@ const Instructions = ({ onNext, onBack }) => {
           type="text"
           label="Delivery Instructions"
           className="w-full"
-          defaultValue={supplier.instruction || ""}
-          {...register("instruction")}
-          error={errors.instruction}
+          defaultValue={supplier.deliveryInstruction || ""}
+          {...register("deliveryInstruction")}
+          error={errors.deliveryInstruction}
         />
       </div>
 

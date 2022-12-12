@@ -1,18 +1,34 @@
 import { useState } from "react"
-import useSupplierStore from "../../../stores/useSupplierStore"
+import { toast } from "react-hot-toast"
+import { APIService } from "../../../lib/axios"
 
+import useSupplierStore from "../../../stores/useSupplierStore"
+import useUserStore from "../../../stores/useUserStore"
 import { Close } from "../../icons"
 import Modal from "../../ui/Modal"
 import Instructions from "./Instructions"
 import SupplierInfo from "./SupplierInfo"
 
-const AddSupplierModal = ({ onClose }) => {
+const AddSupplierModal = ({ onClose, mutate }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const clearSupplierStore = useSupplierStore(
+    (store) => store.clearSupplierStore
+  )
   const [currPage, setCurrPage] = useState(1)
-  // const supplier = useSupplierStore((store) => store.supplier)
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { supplier } = useSupplierStore.getState()
-    console.log(supplier)
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/suppliers`,
+        supplier
+      )
+      toast.success("supplier added")
+      clearSupplierStore()
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
     onClose()
   }
 

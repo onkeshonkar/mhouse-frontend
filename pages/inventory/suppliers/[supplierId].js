@@ -4,7 +4,7 @@ import useSWR from "swr"
 import dayjs from "dayjs"
 
 import useUserStore from "../../../stores/useUserStore"
-import { fetcher } from "../../../lib/axios"
+import { APIService, fetcher } from "../../../lib/axios"
 import Spinner from "../../../components/ui/Spinner"
 import Avatar from "../../../components/ui/Avatar"
 import Button from "../../../components/ui/Button"
@@ -18,133 +18,97 @@ import {
 } from "../../../components/icons"
 import TooltipButton from "../../../components/ui/ToolTipButton"
 import AddCartModal from "../../../components/inventory/suppliers/AddCartModal"
-
-const supplier = {
-  info: {
-    id: 323,
-    totalItemPurchased: 14,
-    avatar: "abc",
-    fullName: "Onkesh",
-    orderVia: "SMS",
-    email: "onkeshkumaronkar@gmail.com",
-    portalUrl: "abc.com",
-    phone: "+917903123164",
-    officePhone: "+917903123164",
-    fullAddress: "3385 Asha Prairie, South Australia, AU",
-    department: "Backery",
-    deliveryInstructions:
-      "This is some delivery instructions. Kuchh bhi liho yhan pe par jyada lamba nhi likhna hai",
-    minOrderValue: 12,
-    deliveryFee: 30,
-    totalPurchase: 36,
-  },
-  cartHistory: [
-    {
-      id: "631f2df5378e719aafc43e78",
-      orderDate: "2022-10-19T16:27:22.329Z",
-      deliverDate: "2022-10-19T16:27:22.329Z",
-      createdBy: {
-        fullName: "Onkesh in",
-        email: "onkeshkumaronkar315@gmail.com",
-        id: "631f2df5378e719aafc43e79",
-      },
-      RecievedBy: {
-        fullName: "kumar",
-        avatar:
-          "https://assets.foodlert.com/avatars/631f2df5378e719aafc43e77-1664193392520.png",
-        email: "onkeshkumaronkar315@gmail.com",
-        id: "631f2df5378e71aafc43e77",
-      },
-      notes:
-        "Some notes extra hai kya make it little longer to test the layout.",
-      paymentType: "Credit",
-      status: "Open",
-      totalPrice: 400,
-      upfrontPayment: { type: "Eftpos", amount: 80 },
-      cartItems: [
-        { id: 123, item: "Burger", qty: 8, unit: "Box", price: 26, total: 208 },
-        { id: 124, item: "Tomato", qty: 10, unit: "kg", price: 30, total: 300 },
-      ],
-    },
-    {
-      id: "631f2df537e719aafc43e77",
-      orderDate: "2022-09-19T16:27:22.329Z",
-      deliverDate: "2022-09-19T16:27:22.329Z",
-      createdBy: {
-        avatar:
-          "https://assets.foodlert.com/avatars/631f2df5378e719aafc43e77-1664193392520.png",
-        fullName: "Onkesh",
-        email: "onkeshkumaronkar315@gmail.com",
-        id: "631f2df5378e719aafc43e77",
-      },
-      RecievedBy: {
-        avatar:
-          "https://assets.foodlert.com/avatars/631f2df5378e719aafc43e77-1664193392520.png",
-        fullName: "Onkesh",
-        email: "onkeshkumaronkar315@gmail.com",
-        id: "631f2df5378e719aaf43e77",
-      },
-      notes: "Some notes",
-      paymentType: "Cash",
-      status: "Delivered",
-      totalPrice: 320,
-      upfrontPayment: {},
-      cartItems: [
-        { id: 123, item: "Burger", qty: 8, unit: "Box", price: 26, total: 208 },
-        { id: 124, item: "Tomato", qty: 10, unit: "kg", price: 30, total: 300 },
-        { id: 134, item: "Meat", qty: 5, unit: "kg", price: 150, total: 750 },
-      ],
-    },
-  ],
-}
+import { toast } from "react-hot-toast"
 
 const Supplier = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [isAddCartModal, setIsAddCartModal] = useState(false)
 
-  const [selectedCart, setSelectedCart] = useState(supplier.cartHistory[0])
+  const [selectedOrder, setSelectedOrder] = useState()
 
-  const cancelOrder = (e) => {
-    console.log(e.currentTarget.name)
+  const cancelOrder = async (e) => {
+    const orderId = e.currentTarget.name
+    try {
+      await APIService.patch(
+        `/v1/branches/${selectedBranch.id}/suppliers/orders/${orderId}`,
+        { status: "Canceled" }
+      )
+      toast.success("Delivery status updated.")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutateOrder()
   }
-  const markOrderDelivered = (e) => {
-    console.log(e.currentTarget.name)
+
+  const markOrderDelivered = async (e) => {
+    const orderId = e.currentTarget.name
+    try {
+      await APIService.patch(
+        `/v1/branches/${selectedBranch.id}/suppliers/orders/${orderId}`,
+        { status: "Delivered" }
+      )
+      toast.success("Delivery status updated.")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutateOrder()
+    mutate()
   }
 
   const route = useRouter()
   const { supplierId } = route.query
 
-  // const { data, error, mutate } = useSWR(
-  //   `/v1/branches/${selectedBranch.id}/supplier/${supplierId}`,
-  //   fetcher,
-  //   {
-  //     errorRetryCount: 2,
-  //   }
-  // )
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
 
-  // if (error) {
-  //   if (error.code === "ERR_NETWORK") {
-  //     toast.error("Network Error")
-  //   } else {
-  //     return (
-  //       <span className="mt-4 block text-center">{`No record exists for Task ${supplierId}`}</span>
-  //     )
-  //   }
-  // }
+  const {
+    data: ordersData,
+    error: orderError,
+    mutate: mutateOrder,
+  } = useSWR(
+    `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}/orders`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
 
-  // if (!data)
-  //   return (
-  //     <div className="mt-10 text-center">
-  //       <Spinner />
-  //     </div>
-  //   )
+  useEffect(() => {
+    if (ordersData) setSelectedOrder(ordersData.orders[0])
+  }, [ordersData])
 
-  // const { supplier } = data
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error("Network Error")
+    } else {
+      return (
+        <span className="mt-4 block text-center">{`No record exists for Supplier ${supplierId}`}</span>
+      )
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { supplier } = data
 
   return (
     <>
       {isAddCartModal && (
-        <AddCartModal onClose={() => setIsAddCartModal(false)} />
+        <AddCartModal
+          onClose={() => setIsAddCartModal(false)}
+          mutateOrder={mutateOrder}
+          supplier={supplierId}
+        />
       )}
 
       <div className="mt-8 ml-6">
@@ -153,16 +117,18 @@ const Supplier = () => {
             <div className="bg-white px-7 py-6 rounded-2xl flex flex-col gap-10 min-w-[720px] group relative">
               <div className="flex justify-between">
                 <div className="flex gap-4">
-                  <Avatar
-                    height={56}
-                    width={56}
-                    user={supplier.info}
-                    className="rounded-xl"
-                  />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-sky-500">
+                    <Avatar
+                      height={56}
+                      width={56}
+                      user={supplier}
+                      className="rounded-xl"
+                    />
+                  </div>
                   <div className="flex flex-col gap-1.5">
-                    <h3 className="font-bold">{supplier.info.fullName}</h3>
+                    <h3 className="font-bold">{supplier.name}</h3>
                     <span className="text-sm opacity-70">
-                      {supplier.info.department}
+                      {supplier.department}
                     </span>
                   </div>
                 </div>
@@ -177,51 +143,50 @@ const Supplier = () => {
                   <li className="flex justify-between ">
                     <p className="opacity-50">Total Items purchased </p>
                     <span className="text-base font-bold opacity-100 text-accent">
-                      {supplier.info.totalItemPurchased} (1800$)
+                      {supplier.purchaseCount} (${" "}
+                      {supplier.purchaseValue / 1000} K)
                     </span>
                   </li>
 
                   <li className="flex justify-between ">
                     <p className="opacity-50">Order via </p>
                     <span className="text-base font-bold">
-                      {supplier.info.orderVia}
+                      {supplier.orderVia}
                     </span>
                   </li>
 
                   <li className="flex justify-between ">
                     <p className="opacity-50">Min Order Value </p>
                     <span className="text-base font-bold">
-                      {supplier.info.minOrderValue} $
+                      {supplier.minOrderValue} $
                     </span>
                   </li>
 
                   <li className="flex justify-between ">
                     <p className="opacity-50">Delivery Fees </p>
                     <span className="text-base font-bold">
-                      {supplier.info.deliveryFee} $
+                      {supplier.deliveryFee} $
                     </span>
                   </li>
 
                   <li>
                     <h3 className="opacity-50">Delivery Instructions</h3>
-                    <p className="max-w-xs">
-                      {supplier.info.deliveryInstructions}
-                    </p>
+                    <p className="max-w-xs">{supplier.deliveryInstruction}</p>
                   </li>
                 </ul>
 
                 <div className="flex flex-col gap-5 text-sm">
                   <p className="flex gap-3">
                     <Location />
-                    {supplier.info.fullAddress}
+                    {supplier.fullAddress}
                   </p>
                   <p className="flex gap-3">
                     <Gmail />
-                    {supplier.info.email}
+                    {supplier.email}
                   </p>
                   <p className="flex gap-3">
                     <Phone />
-                    {supplier.info.officePhone}
+                    {supplier.officePhone}
                   </p>
                   <p className="flex gap-3">
                     <svg
@@ -238,7 +203,7 @@ const Supplier = () => {
                         d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
                       />
                     </svg>
-                    {supplier.info.phone}
+                    {supplier.phoneNumber}
                   </p>
                   <p className="flex gap-3">
                     <svg
@@ -255,7 +220,7 @@ const Supplier = () => {
                         d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25"
                       />
                     </svg>
-                    {supplier.info.portalUrl}
+                    {supplier.portalURL}
                   </p>
                 </div>
               </aside>
@@ -299,26 +264,26 @@ const Supplier = () => {
                 </thead>
 
                 <tbody className="bg-white">
-                  {selectedCart.cartItems.map((cartItem) => (
-                    <tr key={cartItem.id}>
+                  {selectedOrder?.orderItems.map((order) => (
+                    <tr key={order.stocktakeId}>
                       <td className="whitespace-nowrap py-2.5 pl-7 pr-4 text-sm text-primary font-normal ">
-                        {cartItem.item}
+                        {order.item}
                       </td>
 
                       <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                        {cartItem.qty}
+                        {order.quantity}
                       </td>
 
                       <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal opacity-50">
-                        {cartItem.unit}
+                        {order.unit}
                       </td>
 
                       <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                        {cartItem.price} $
+                        {order.price} $
                       </td>
 
                       <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-bold ">
-                        {cartItem.total} $
+                        {order.price * order.quantity} $
                       </td>
                     </tr>
                   ))}
@@ -327,140 +292,140 @@ const Supplier = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 flex-grow">
-            {supplier.cartHistory.map((cart) => (
-              <div
-                className={`${
-                  cart.id == selectedCart.id && "ring-2 ring-accent"
-                } bg-white py-4 px-6 rounded-2xl grid grid-cols-3 gap-4 items-center`}
-                key={cart.id}
-                onClick={() => {
-                  setSelectedCart(cart)
-                }}
-              >
-                <div className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-light opacity-50">Order Date</span>
-                  <span>
-                    <Notebook width={16} height={16} className="inline mr-2" />
-                    {dayjs(cart.orderDate).format("DD MMM YYYY")}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-light opacity-50">Delivery Date</span>
-                  {cart.deliverDate ? (
+          <div className="flex flex-col gap-4 flex-grow px-2 py-2 max-h-[80vh] overflow-y-auto">
+            {ordersData &&
+              selectedOrder &&
+              ordersData.orders.map((order) => (
+                <div
+                  className={`${
+                    order.id == selectedOrder.id && "ring-2 ring-accent"
+                  } bg-white py-4 px-6 rounded-2xl grid grid-cols-3 gap-4 items-center`}
+                  key={order.id}
+                  onClick={() => {
+                    setSelectedOrder(order)
+                  }}
+                >
+                  <div className="flex flex-col gap-1.5 text-sm">
+                    <span className="font-light opacity-50">Order Date</span>
                     <span>
                       <Notebook
                         width={16}
                         height={16}
                         className="inline mr-2"
                       />
-                      {dayjs(cart.deliverDate).format("DD MMM YYYY")}
+                      {dayjs(order.createdAt).format("DD MMM YYYY")}
                     </span>
-                  ) : (
-                    "---"
-                  )}
-                </div>
+                  </div>
 
-                <div className="justify-self-center">
-                  {cart.status === "Open" && (
-                    <div className="flex gap-2 justify-self-end">
-                      <TooltipButton
-                        name={cart.id}
-                        onClick={markOrderDelivered}
-                        text={"Mark as Delivered"}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="w-8 h-8 text-x-green"
+                  <div className="flex flex-col gap-1.5 text-sm">
+                    <span className="font-light opacity-50">Delivery Date</span>
+                    {order.updatedAt ? (
+                      <span>
+                        <Notebook
+                          width={16}
+                          height={16}
+                          className="inline mr-2"
+                        />
+                        {dayjs(order.deliverDate).format("DD MMM YYYY")}
+                      </span>
+                    ) : (
+                      "---"
+                    )}
+                  </div>
+
+                  <div className="justify-self-center">
+                    {order.status === "Open" && (
+                      <div className="flex gap-2 justify-self-end">
+                        <TooltipButton
+                          name={order.id}
+                          onClick={markOrderDelivered}
+                          text={"Mark as Delivered"}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </TooltipButton>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-8 h-8 text-x-green"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </TooltipButton>
 
-                      <TooltipButton
-                        text={"Cancel Order"}
-                        name={cart.id}
-                        onClick={cancelOrder}
-                      >
-                        <Close width={24} height={24} />
-                      </TooltipButton>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
-                    <Avatar width={36} height={36} user={cart.createdBy} />
+                        <TooltipButton
+                          text={"Cancel Order"}
+                          name={order.id}
+                          onClick={cancelOrder}
+                        >
+                          <Close width={24} height={24} />
+                        </TooltipButton>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex flex-col text-sm">
-                    <span className="text-xs opacity-50">Created by</span>
-                    <span>{cart.createdBy.fullName}</span>
-                  </div>
-                </div>
-
-                {cart.RecievedBy && (
                   <div className="flex gap-2">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
-                      <Avatar width={36} height={36} user={cart.RecievedBy} />
+                      <Avatar width={36} height={36} user={order.createdBy} />
                     </div>
 
                     <div className="flex flex-col text-sm">
-                      <span className="text-xs opacity-50">Received by</span>
-                      <span>{cart.RecievedBy.fullName}</span>
+                      <span className="text-xs opacity-50">Created by</span>
+                      <span>{order.createdBy.fullName}</span>
                     </div>
                   </div>
-                )}
 
-                <div className="justify-self-center">
-                  {cart.status === "Delivered" && (
-                    <div className="text-sm text-x-green px-3 py-1.5 bg-[#EBFBF5] rounded-3xl justify-self-center">
-                      Delivered
-                    </div>
-                  )}
-                  {cart.status === "Open" && (
-                    <div className="text-sm text-accent px-3 py-1.5 bg-[#FFF9EC] rounded-3xl justify-self-center">
-                      Open
-                    </div>
-                  )}
-                  {cart.status === "Canceled" && (
-                    <div className="text-sm text-x-red px-3 py-1.5 bg-[#FFEEEE] rounded-3xl justify-self-center">
-                      Canceled
-                    </div>
-                  )}
-                </div>
+                  {order.updatedBy && (
+                    <div className="flex gap-2">
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
+                        <Avatar width={36} height={36} user={order.updatedBy} />
+                      </div>
 
-                <div className="col-end-4 justify-self-center">
-                  {cart.upfrontPayment?.amount && (
+                      <div className="flex flex-col text-sm">
+                        <span className="text-xs opacity-50">Received by</span>
+                        <span>{order.updatedBy.fullName}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="justify-self-center col-end-4">
+                    {order.status === "Delivered" && (
+                      <div className="text-sm text-x-green px-3 py-1.5 bg-[#EBFBF5] rounded-3xl justify-self-center">
+                        Delivered
+                      </div>
+                    )}
+                    {order.status === "Open" && (
+                      <div className="text-sm text-accent px-3 py-1.5 bg-[#FFF9EC] rounded-3xl justify-self-center">
+                        Open
+                      </div>
+                    )}
+                    {order.status === "Canceled" && (
+                      <div className="text-sm text-x-red px-3 py-1.5 bg-[#FFEEEE] rounded-3xl justify-self-center">
+                        Canceled
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col text-sm">
+                    <span className="text-xs opacity-50">Payment Method</span>
+                    <span>{order.paymentMethod}</span>
+                  </div>
+
+                  <div className="col-end-4 justify-self-center">
                     <span className="text-2xl font-bold">
-                      {cart.upfrontPayment.amount} /{" "}
+                      {order.upfrontPayment} /{" "}
                     </span>
-                  )}
-                  <span className="text-2xl font-bold text-x-green">
-                    {cart.totalPrice} $
-                  </span>
-                </div>
 
-                <div className="flex flex-col text-sm col-span-2">
-                  <span className="text-xs opacity-50">Notes</span>
-                  <span>{cart.notes}</span>
+                    <span className="text-2xl font-bold text-x-green">
+                      {order.orderValue} $
+                    </span>
+                  </div>
                 </div>
-
-                <div className="flex flex-col text-sm">
-                  <span className="text-xs opacity-50">Payment Method</span>
-                  <span>{cart.paymentType}</span>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>

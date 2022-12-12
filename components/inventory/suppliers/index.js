@@ -1,71 +1,59 @@
 import { useState } from "react"
 import Link from "next/link"
+import useSWRImmutable from "swr/immutable"
 
 import { Filter, Paper, Phone, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
 import Button from "../../ui/Button"
 import TooltipButton from "../../ui/ToolTipButton"
 import AddSupplierModal from "./AddSupplierModal"
-
-const suppliers = [
-  {
-    id: 123,
-    avatar: "abc",
-    fullName: "Onkesh",
-    email: "onkeshkumaronkar@gmail.com",
-    portalUrl: "abc.com",
-    phone: "+917903123164",
-    officePhone: "+917903123164",
-    fullAddress: "Abc road abc gali",
-    department: "kuch bh",
-    minOrderValue: 12,
-    deliveryFee: 30,
-    totalPurchase: 36,
-  },
-  {
-    id: 223,
-    avatar: "abc",
-    fullName: "Onkesh",
-    email: "onkeshkumaronkar@gmail.com",
-    portalUrl: "abc.com",
-    phone: "+917903123164",
-    officePhone: "+917903123164",
-    fullAddress: "Abc road abc gali",
-    department: "kuch bh",
-    minOrderValue: 12,
-    deliveryFee: 30,
-    totalPurchase: 36,
-  },
-  {
-    id: 323,
-    avatar: "abc",
-    fullName: "Onkesh",
-    email: "onkeshkumaronkar@gmail.com",
-    portalUrl: "abc.com",
-    phone: "+917903123164",
-    officePhone: "+917903123164",
-    fullAddress: "Abc road abc gali",
-    department: "kuch bh",
-    minOrderValue: 12,
-    deliveryFee: 30,
-    totalPurchase: 36,
-  },
-]
+import useUserStore from "../../../stores/useUserStore"
+import Spinner from "../../ui/Spinner"
+import { fetcher } from "../../../lib/axios"
 
 const Supplier = () => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [isAddSupplier, setIsAddSupplier] = useState(false)
+
+  const { data, error, mutate } = useSWRImmutable(
+    `/v1/branches/${selectedBranch.id}/suppliers`,
+    fetcher
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      // toast.error(JSON.stringify(error))
+      return <span>{"Can't fetch suppliers list"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { suppliers } = data
 
   return (
     <>
       {isAddSupplier && (
-        <AddSupplierModal onClose={() => setIsAddSupplier(false)} />
+        <AddSupplierModal
+          onClose={() => setIsAddSupplier(false)}
+          mutate={mutate}
+        />
       )}
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Suppliers Management</h1>
-            <p className="text-sm font-light">153 Total Suppliers</p>
+            <p className="text-sm font-light">
+              {suppliers.length} Total Suppliers
+            </p>
           </div>
 
           <div className="flex gap-6">
@@ -104,7 +92,7 @@ const Supplier = () => {
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-base">{sup.fullName}</h3>
+                      <h3 className="font-bold text-base">{sup.name}</h3>
                       <span className="text-sm opacity-70">
                         {sup.department}
                       </span>
@@ -130,7 +118,7 @@ const Supplier = () => {
                           fillRule="evenodd"
                         />
                       </svg>
-                      <span className="text-base">{sup.phone}</span>
+                      <span className="text-base">{sup.phoneNumber}</span>
                     </div>
                   </div>
 
@@ -139,7 +127,7 @@ const Supplier = () => {
                       <span className="opacity-50 font-light text-sm">
                         Items purchased
                       </span>
-                      {sup.totalPurchase}
+                      {sup.purchaseCount}
                     </div>
                     <div className="flex flex-col items-center gap-1.5 font-bold text-base">
                       <span className="opacity-50 font-light text-sm">
