@@ -34,8 +34,7 @@ const AddCartModal = ({ onClose, supplier, mutateOrder }) => {
   useEffect(() => {
     if (data)
       setCart([
-        ...data.stocktake.map((product) => ({
-          // ...product,
+        ...data.stocktakes.map((product) => ({
           item: product.item,
           unit: product.unit,
           price: product.price,

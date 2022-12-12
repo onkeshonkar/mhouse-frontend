@@ -292,6 +292,15 @@ const Supplier = () => {
             </div>
           </div>
 
+          {!ordersData.lenght && (
+            <div className="flex flex-col gap-1 py-4 bg-white w-full items-center justify-center rounded-xl">
+              <span className="text-lg font-semibold opacity-70">
+                Create first CART
+              </span>
+              <span>for {supplier.name}</span>
+            </div>
+          )}
+
           <div className="flex flex-col gap-4 flex-grow px-2 py-2 max-h-[80vh] overflow-y-auto">
             {ordersData &&
               selectedOrder &&

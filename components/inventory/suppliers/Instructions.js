@@ -35,7 +35,6 @@ const Instructions = ({ onNext, onBack }) => {
     handleSubmit,
     formState: { errors },
     control,
-    setValue,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -43,8 +42,6 @@ const Instructions = ({ onNext, onBack }) => {
       deliveryFee: supplier.deliveryFee || 0,
     },
   })
-
-  // setValue()
 
   const onSubmit = async (data) => {
     if (!department) return toast.error("Select Department")

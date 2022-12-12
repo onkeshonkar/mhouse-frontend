@@ -1,8 +1,13 @@
 import { useState } from "react"
+import useSWRImmutable from "swr/immutable"
+
+import useUserStore from "../../../stores/useUserStore"
 import { Delete, Filter, Paper, Plus } from "../../icons"
 import Button from "../../ui/Button"
 import TooltipButton from "../../ui/ToolTipButton"
 import AddStocktakeModal from "./AddStocktakeModal"
+import { fetcher } from "../../../lib/axios"
+import Spinner from "../../ui/Spinner"
 
 const stockTakes = [
   {
@@ -44,19 +49,48 @@ const stockTakes = [
 ]
 
 const Stocktake = () => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [isAddStocktake, setIsAddStocktake] = useState(false)
+
+  const { data, error, mutate } = useSWRImmutable(
+    `/v1/branches/${selectedBranch.id}/stocktakes`,
+    fetcher
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      // toast.error(JSON.stringify(error))
+      return <span>{"Can't fetch stocktakes"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { stocktakes } = data
 
   return (
     <>
       {isAddStocktake && (
-        <AddStocktakeModal onClose={() => setIsAddStocktake(false)} />
+        <AddStocktakeModal
+          onClose={() => setIsAddStocktake(false)}
+          mutate={mutate}
+        />
       )}
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Stocktake Management</h1>
-            <p className="text-sm font-light">160 Total Items (3,400$)</p>
+            <p className="text-sm font-light">
+              {stocktakes.length} Total Items
+            </p>
           </div>
 
           <div className="flex gap-6">
@@ -87,55 +121,45 @@ const Stocktake = () => {
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-left"
                 >
                   Unit
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-left"
                 >
-                  Begin
+                  Price
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal  px-4 py-2 text-center"
                 >
-                  Purchased
+                  Last Purchased
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-left"
                 >
                   Min stocks
                 </th>
+
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
-                >
-                  Sold
-                </th>
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-left"
                 >
                   Waste
                 </th>
+
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
-                >
-                  Stock
-                </th>
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-center"
                 >
                   In-Stock
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal px-4 py-2 text-center"
                 >
                   Actions
                 </th>
@@ -143,45 +167,38 @@ const Stocktake = () => {
             </thead>
 
             <tbody className="bg-white">
-              {stockTakes.map((stocktake) => (
+              {stocktakes.map((stocktake) => (
                 <tr key={stocktake.id}>
-                  <td className="whitespace-nowrap pl-8 pr-4 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap pl-8 pr-4 text-sm text-primary font-normal px-4 py-2">
                     {stocktake.item}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2">
                     {stocktake.unit}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.begin}
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2">
+                    $ {stocktake.price}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.purchased}
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2 text-center">
+                    {stocktake.lastBuy?.quantity || "---"}{" "}
+                    {stocktake.lastBuy?.quantity && stocktake.unit}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.minStock}
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2">
+                    {stocktake.minStock} {stocktake.unit}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.sold}
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2">
+                    {stocktake.waste} {stocktake.unit}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.waste}
+                  <td className="whitespace-nowrap text-base font-bold text-center">
+                    {stocktake.currentStock} {stocktake.unit}
                   </td>
 
-                  <td className="whitespace-nowrap py-5 px-4 text-sm text-primary font-normal ">
-                    {stocktake.stock}
-                  </td>
-
-                  <td className="whitespace-nowrap py-5 px-4 text-base font-bold">
-                    {stocktake.inStock}
-                  </td>
-
-                  <td className="whitespace-nowrap py-5 pl-8 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap text-sm text-primary font-normal px-4 py-2 text-center">
                     <button className="text-x-red" onClick={() => {}}>
                       <Delete />
                     </button>
