@@ -1,5 +1,8 @@
 import { useMemo, useRef, useState } from "react"
+import { toast } from "react-hot-toast"
 
+import { APIService } from "../../../lib/axios"
+import useUserStore from "../../../stores/useUserStore"
 import { Arrow, Close } from "../../icons"
 import Button from "../../ui/Button"
 import CurrencyCount from "../../ui/CurrencyCount"
@@ -9,10 +12,13 @@ import OTPBox from "../../ui/OTPBox"
 import TextArea from "../../ui/TextArea"
 import ClosingCount from "./ClosingCount"
 
-const RegisterNewClosing = ({ onClose }) => {
+const RegisterNewClosing = ({ onClose, mutate }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
   const [note, setNote] = useState()
   const [currentPage, setCurrentPage] = useState(1)
+  const [txnCount, setTxnCount] = useState(0)
 
   const currencyRef = useRef()
   const [income, setIncome] = useState({
@@ -41,8 +47,21 @@ const RegisterNewClosing = ({ onClose }) => {
     return _totalRevenue.toFixed(2)
   }, [income, cash])
 
-  const onSubmit = () => {
-    console.log(currencyRef.current)
+  const onSubmit = async () => {
+    const data = {
+      totalIncome,
+      note,
+      ...income,
+      cash,
+      transactionCount: txnCount,
+    }
+    try {
+      await APIService.post(`/v1/branches/${selectedBranch.id}/closings`, data)
+      toast.success("closing added")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+    mutate()
     onClose()
   }
 
@@ -75,7 +94,12 @@ const RegisterNewClosing = ({ onClose }) => {
         {currentPage == 2 && (
           <div className="flex flex-col items-center gap-6">
             <div className="flex gap-6 m-0.5">
-              <Input type="Number" label="Transaction Count" />
+              <Input
+                type="Number"
+                label="Transaction Count"
+                value={txnCount}
+                onChange={(e) => setTxnCount(e.target.valueAsNumber)}
+              />
 
               <div className="">
                 <span className="text-2xl font-bold text-x-green">

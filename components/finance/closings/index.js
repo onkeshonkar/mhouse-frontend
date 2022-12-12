@@ -39,7 +39,10 @@ const Closing = () => {
   return (
     <>
       {isNewClosing && (
-        <RegisterNewClosing onClose={() => setIsNewClosing(false)} />
+        <RegisterNewClosing
+          onClose={() => setIsNewClosing(false)}
+          mutate={mutate}
+        />
       )}
 
       <main>
