@@ -10,6 +10,7 @@ import Avatar from "../../../components/ui/Avatar"
 import Button from "../../../components/ui/Button"
 import {
   Close,
+  Delete,
   Gmail,
   Location,
   Notebook,
@@ -25,6 +26,8 @@ const Supplier = () => {
   const [isAddCartModal, setIsAddCartModal] = useState(false)
 
   const [selectedOrder, setSelectedOrder] = useState()
+  const route = useRouter()
+  const { supplierId } = route.query
 
   const cancelOrder = async (e) => {
     const orderId = e.currentTarget.name
@@ -55,9 +58,6 @@ const Supplier = () => {
     mutate()
   }
 
-  const route = useRouter()
-  const { supplierId } = route.query
-
   const { data, error, mutate } = useSWR(
     `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}`,
     fetcher,
@@ -77,6 +77,19 @@ const Supplier = () => {
       errorRetryCount: 2,
     }
   )
+
+  const onDelete = async () => {
+    try {
+      await APIService.delete(
+        `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}`
+      )
+      toast.success("supplier deleted")
+      route.back()
+      mutate()
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+  }
 
   useEffect(() => {
     if (ordersData) setSelectedOrder(ordersData.orders[0])
@@ -114,8 +127,8 @@ const Supplier = () => {
       <div className="mt-8 ml-6">
         <div className="flex gap-4">
           <div className="flex flex-col gap-4">
-            <div className="bg-white px-7 py-6 rounded-2xl flex flex-col gap-10 min-w-[720px] group relative">
-              <div className="flex justify-between">
+            <div className="bg-white px-7 py-6 rounded-2xl flex flex-col gap-10 min-w-[720px] relative">
+              <div className="flex justify-between peer">
                 <div className="flex gap-4">
                   <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-sky-500">
                     <Avatar
@@ -132,13 +145,23 @@ const Supplier = () => {
                     </span>
                   </div>
                 </div>
-                <Button onClick={() => setIsAddCartModal(true)}>
-                  <Plus width={20} height={20} className="mr-2" />
-                  <span>New Cart</span>
-                </Button>
+
+                <div className="flex gap-4 items-center">
+                  <TooltipButton
+                    text={"Delete"}
+                    className="bg-x-red"
+                    onClick={onDelete}
+                  >
+                    <Delete className="text-white" />
+                  </TooltipButton>
+                  <Button onClick={() => setIsAddCartModal(true)}>
+                    <Plus width={20} height={20} className="mr-2" />
+                    <span>New Cart</span>
+                  </Button>
+                </div>
               </div>
 
-              <aside className="hidden group-hover:flex rounded-b-2xl justify-between absolute bg-white w-full left-0 px-7 py-6 top-24 z-10">
+              <aside className="hidden peer-hover:flex rounded-b-2xl justify-between absolute bg-white w-full left-0 px-7 py-6 top-24 z-10">
                 <ul className="flex flex-col gap-4 text-sm flex-grow pr-10">
                   <li className="flex justify-between ">
                     <p className="opacity-50">Total Items purchased </p>
@@ -292,7 +315,7 @@ const Supplier = () => {
             </div>
           </div>
 
-          {!ordersData.lenght && (
+          {ordersData && !ordersData.orders.length && (
             <div className="flex flex-col gap-1 py-4 bg-white w-full items-center justify-center rounded-xl">
               <span className="text-lg font-semibold opacity-70">
                 Create first CART

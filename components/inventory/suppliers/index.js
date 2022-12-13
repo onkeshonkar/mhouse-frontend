@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Link from "next/link"
-import useSWRImmutable from "swr/immutable"
+import useSWR from "swr"
 
 import { Filter, Paper, Phone, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
@@ -15,9 +15,12 @@ const Supplier = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [isAddSupplier, setIsAddSupplier] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
+  const { data, error, mutate } = useSWR(
     `/v1/branches/${selectedBranch.id}/suppliers`,
-    fetcher
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
   )
 
   if (error) {
