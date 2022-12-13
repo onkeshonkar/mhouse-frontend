@@ -1,63 +1,74 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import useSWR from "swr"
 
 import { menuEngContext } from "../../context/MenuEngContext"
+import { fetcher } from "../../lib/axios"
+import useUserStore from "../../stores/useUserStore"
 import { Arrow, Delete, Plus, Search } from "../icons"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
+import Spinner from "../ui/Spinner"
 
-const stockTakes = [
-  {
-    id: 12,
-    item: "Tomato",
-    unit: "kg",
-    price: 12,
-  },
-  {
-    id: 123,
-    item: "Burger",
-    unit: "L",
-    price: 14,
-  },
-  {
-    id: 1234,
-    item: "Meat",
-    unit: "kg",
-    price: 19,
-  },
-]
+const AddRawMaterial = ({ handleSubmit, onBack }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-const AddRawMaterial = ({ onNext, onBack }) => {
   const { menuDetails, setMenuDetails } = useContext(menuEngContext)
   const [query, setQuery] = useState("")
   const [cart, setCart] = useState(menuDetails.cart || [])
 
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/stocktakes`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return <span>{"Can't fetch stocktake list"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { stocktakes } = data
+
   const filteredStock =
     query === ""
-      ? stockTakes
-      : stockTakes.filter((stock) => {
+      ? stocktakes
+      : stocktakes.filter((stock) => {
           return stock.item.toLowerCase().includes(query.toLowerCase())
         })
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setMenuDetails({
       ...menuDetails,
       cart,
     })
-    onBack()
+
+    handleSubmit({ ...menuDetails, rawItems: cart })
   }
 
   const cartAmount = cart.reduce((acc, cartItem) => {
-    return acc + cartItem.price * cartItem.qty
+    return acc + cartItem.price * cartItem.quantity
   }, 0)
 
   const addMenuToCart = (e) => {
     const stockId = e.currentTarget.name
-    const foundStock = stockTakes.find((m) => m.id == stockId)
+    const foundStock = stocktakes.find((m) => m.id == stockId)
     setCart((prevCart) => {
-      if (!prevCart.length) return [{ ...foundStock, qty: 1 }]
+      if (!prevCart.length) return [{ ...foundStock, quantity: 1 }]
       const cartStock = prevCart.find((m) => m.id == stockId)
-      if (cartStock) cartStock.qty++
-      else prevCart.push({ ...foundStock, qty: 1 })
+      if (cartStock) cartStock.quantity++
+      else prevCart.push({ ...foundStock, quantity: 1 })
       return [...prevCart]
     })
   }
@@ -88,106 +99,112 @@ const AddRawMaterial = ({ onNext, onBack }) => {
           </div>
         </div>
 
-        <div className="flex gap-9 justify-between max-h-80 overflow-y-auto">
-          <table className="max-w-xl w-full border-spacing-y-1 border-separate">
-            <thead className="bg-[#F1F1F5]">
-              <tr>
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-left px-5 py-2"
-                >
-                  Item
-                </th>
+        <div className="flex gap-9 justify-between">
+          <div className="w-full max-h-80 overflow-y-auto">
+            <table className="max-w-xl w-full border-spacing-y-1 border-separate self-start">
+              <thead className="bg-[#F1F1F5]">
+                <tr>
+                  <th
+                    scope="col"
+                    className="text-sm text-primary font-normal text-left px-5 py-2"
+                  >
+                    Item
+                  </th>
 
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-left px-5 py-2"
-                >
-                  Unit
-                </th>
+                  <th
+                    scope="col"
+                    className="text-sm text-primary font-normal text-left px-5 py-2"
+                  >
+                    Unit
+                  </th>
 
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-left px-2 py-2"
-                >
-                  Price
-                </th>
-                <th
-                  scope="col"
-                  className="text-sm text-primary font-normal text-center  px-2 py-2"
-                >
-                  Action
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredStock.map((stockTake) => (
-                <tr key={stockTake.id}>
-                  <td className="text-sm text-primary font-normal text-left px-5 py-2">
-                    {stockTake.item}
-                  </td>
-
-                  <td className="whitespace-nowrap px-5 py-2 text-sm text-primary font-normal text-left">
-                    {stockTake.unit}
-                  </td>
-                  <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal text-left">
-                    {stockTake.price} $
-                  </td>
-                  <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal ">
-                    <button
-                      name={stockTake.id}
-                      onClick={addMenuToCart}
-                      className="text-xs text-white bg-accent font-semibold rounded-md py-1.5 px-2 cursor-pointer"
-                    >
-                      ADD
-                    </button>
-                  </td>
+                  <th
+                    scope="col"
+                    className="text-sm text-primary font-normal px-2 py-2"
+                  >
+                    Price
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-sm text-primary font-normal px-2 py-2"
+                  >
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
 
-          <div className="max-w-xl w-full">
-            <h3 className="bg-primary text-white text-left px-4 py-2 text-sm">
-              Raw Material added to this Menu Item
-            </h3>
-            <table className=" w-full border-spacing-y-1 border-separate max-h-80 overflow-y-auto">
               <tbody>
-                {cart.map((cartItem) => (
-                  <tr key={cartItem.id}>
+                {filteredStock.map((stockTake) => (
+                  <tr key={stockTake.id}>
                     <td className="text-sm text-primary font-normal text-left px-5 py-2">
-                      <div className="flex flex-col gap-2 col-span-2">
-                        <span className="text-sm">{cartItem.item}</span>
-                        <span className="text-xs opacity-80">
-                          ( {cartItem.price} $)
-                        </span>
-                      </div>
+                      {stockTake.item}
                     </td>
 
                     <td className="whitespace-nowrap px-5 py-2 text-sm text-primary font-normal text-left">
-                      {cartItem.qty}
-                      <span className="opacity-60"> {cartItem.unit}</span>
+                      {stockTake.unit}
                     </td>
-                    <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal text-left">
-                      {cartItem.price * cartItem.qty} $
+                    <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal text-center">
+                      {stockTake.price} $
                     </td>
-                    <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold">
-                      <Delete
-                        width={16}
-                        height={16}
-                        className="text-x-red cursor-pointer"
-                        onClick={() => {
-                          setCart((prevCart) =>
-                            prevCart.filter((m) => m.id !== cartItem.id)
-                          )
-                        }}
-                      />
+                    <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal">
+                      <button
+                        name={stockTake.id}
+                        onClick={addMenuToCart}
+                        className="text-xs text-white bg-accent font-semibold rounded-md py-1.5 px-2 cursor-pointer"
+                      >
+                        ADD
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="max-w-xl w-full">
+            <h3 className="bg-primary text-white text-left px-4 py-2 text-sm">
+              Raw Material added to this Menu Item
+            </h3>
+            <div className="max-h-80 overflow-y-auto">
+              <table className="w-full border-spacing-y-1 border-separate max-h-80 overflow-y-auto">
+                <tbody>
+                  {cart.map((cartItem) => (
+                    <tr key={cartItem.id}>
+                      <td className="text-sm text-primary font-normal text-left px-5 py-2">
+                        <div className="flex flex-col gap-2 col-span-2 ">
+                          <span className="text-sm">{cartItem.item}</span>
+                          <span className="text-xs opacity-80">
+                            ( {cartItem.price} $)
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="whitespace-nowrap px-5 py-2 text-sm text-primary font-normal text-center">
+                        {cartItem.quantity}
+                        <span className="opacity-60"> {cartItem.unit}</span>
+                      </td>
+                      <td className="whitespace-nowrap px-2 py-2 text-sm text-primary font-normal text-center">
+                        {cartItem.price * cartItem.quantity} $
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold">
+                        <span className="flex justify-center">
+                          <Delete
+                            width={16}
+                            height={16}
+                            className="text-x-red cursor-pointer"
+                            onClick={() => {
+                              setCart((prevCart) =>
+                                prevCart.filter((m) => m.id !== cartItem.id)
+                              )
+                            }}
+                          />
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

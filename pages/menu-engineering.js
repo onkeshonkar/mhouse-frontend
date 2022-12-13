@@ -11,57 +11,55 @@ import TooltipButton from "../components/ui/ToolTipButton"
 import { fetcher } from "../lib/axios"
 import useUserStore from "../stores/useUserStore"
 
-const menus = [
-  {
-    id: "631f2df5378e719aafc43e7",
-    name: "Pizza Margarita",
-    sellCount: 15,
-    sellPrice: 48,
-    costPrice: 20,
-    nutriScore: "A",
-    popularity: "High",
-    profitability: "High",
-    status: "Plowhorse",
-  },
-  {
-    id: "631f2df5378e719aafc3e7",
-    name: "Pizza Chiken",
-    picture: "abc",
-    sellCount: 15,
-    sellPrice: 48,
-    costPrice: 20,
-    nutriScore: "A",
-    popularity: "High",
-    profitability: "Low",
-    status: "Plowhorse",
-  },
-  {
-    id: "631f2df5378e719aafc437",
-    name: "Chawmin",
-    picture: "abc",
-    sellCount: 15,
-    sellPrice: 48,
-    costPrice: 20,
-    nutriScore: "A",
-    popularity: "LOw",
-    profitability: "Low",
-    status: "Stars",
-  },
-]
+function random_item(items) {
+  return items[Math.floor(Math.random() * items.length)]
+}
+
+const menuStatus = ["Plowhorse", "Stars", "Puzzle", "Dog"]
 
 const MenuEngineering = () => {
-  const [isAddNewMenu, setIsAddNewMenu] = useState(false)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const [isAddNewMenu, setIsAddNewMenu] = useState(false)
+
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/menu`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return <span>{"Can't fetch menu list"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { menu } = data
+  const totalItemSold = menu.reduce((prevVal, currVal) => {
+    return prevVal + currVal.sellCount
+  }, 0)
 
   return (
     <>
-      {isAddNewMenu && <AddMenuModal onClose={() => setIsAddNewMenu(false)} />}
+      {isAddNewMenu && (
+        <AddMenuModal onClose={() => setIsAddNewMenu(false)} mutate={mutate} />
+      )}
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Menu Engineering</h1>
-            <p className="text-sm font-light">{menus.length} Total Items</p>
+            <p className="text-sm font-light">{menu.length} Total Items</p>
           </div>
 
           <div className="flex gap-4 items-center">
@@ -92,45 +90,45 @@ const MenuEngineering = () => {
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
-                  No. Sold (of All items)
+                  No. Sold (% of All items)
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Sell Price
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Cost Price
                 </th>
 
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Nutri Score
                 </th>
 
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Popularity
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Profitability
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Status
                 </th>
@@ -138,18 +136,15 @@ const MenuEngineering = () => {
             </thead>
 
             <tbody className="bg-white">
-              {menus.map((menu) => (
-                <tr key={menu.id}>
+              {menu.map((menuItem) => (
+                <tr key={menuItem.id}>
                   <td className="text-sm text-primary font-normal text-left pl-8 pr-4 py-2">
                     <div className="flex gap-3 items-center">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-accent">
-                        {menu.picture ? (
+                        {menuItem.picture ? (
                           <Image
-                            // src={user.avatar}
-                            src={
-                              "https://images.unsplash.com/photo-1522228115018-d838bcce5c3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80"
-                            }
-                            alt="avatar"
+                            src={menuItem.picture}
+                            alt="menu pic"
                             width={36}
                             height={36}
                             objectFit="cover"
@@ -157,42 +152,45 @@ const MenuEngineering = () => {
                           />
                         ) : (
                           <span className="text-xl text-white flex p-0">
-                            {menu.name?.charAt(0).toUpperCase()}
+                            {menuItem.dish?.charAt(0).toUpperCase()}
                           </span>
                         )}
                       </div>
-                      <span>{menu.name}</span>
+                      <span>{menuItem.dish}</span>
                     </div>
                   </td>
 
-                  <td className="text-sm text-primary font-bold text-left px-4 py-2">
-                    {menu.sellCount}
-                  </td>
-
-                  <td className="text-sm text-accent font-normal text-left px-4 py-2">
-                    $ {menu.sellPrice}
-                  </td>
-
-                  <td className="text-sm text-x-red font-normal text-left px-4 py-2">
-                    $ {menu.costPrice}
-                  </td>
-
-                  <td className="text-sm text-primary font-normal text-left px-4 py-2">
-                    <span className="p-2 rounded-xl bg-x-green text-white">
-                      {menu.nutriScore}
+                  <td className="text-sm text-primary font-bold text-center px-4 py-2">
+                    {menuItem.sellCount}{" "}
+                    <span className="opacity-50">
+                      ({(menuItem.sellCount * 100) / totalItemSold} %)
                     </span>
                   </td>
 
-                  <td className="text-sm text-primary font-normal text-left px-4 py-2">
-                    {menu.popularity}
+                  <td className="text-sm text-accent font-normal text-center px-4 py-2">
+                    $ {menuItem.sellPrice}
                   </td>
 
-                  <td className="text-sm text-primary font-normal text-left px-4 py-2">
-                    {menu.profitability}
+                  <td className="text-sm text-x-red font-normal text-center px-4 py-2">
+                    $ {menuItem.rawMaterialCost}
                   </td>
 
-                  <td className="text-sm text-primary font-normal text-left px-4 py-2">
-                    {menu.status}
+                  <td className="text-sm text-primary font-normal text-center px-4 py-2">
+                    <span className="p-2 rounded-xl bg-x-green text-white">
+                      {menuItem.nutriScore}
+                    </span>
+                  </td>
+
+                  <td className="text-sm text-primary font-normal text-center px-4 py-2">
+                    {random_item(["High", "Low"])}
+                  </td>
+
+                  <td className="text-sm text-primary font-normal text-center px-4 py-2">
+                    {random_item(["High", "Low"])}
+                  </td>
+
+                  <td className="text-sm text-primary font-normal text-center px-4 py-2">
+                    {random_item(menuStatus)}
                   </td>
                 </tr>
               ))}

@@ -1,5 +1,5 @@
 import { useContext, useMemo, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useController, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import dayjs from "dayjs"
@@ -11,18 +11,15 @@ import Button from "../ui/Button"
 import Input from "../ui/Input"
 import { menuEngContext } from "../../context/MenuEngContext"
 import ListInput from "../ui/ListInput"
+import { toast } from "react-hot-toast"
 
 const seasons = ["Winter", "Summer", "Black Friday", "Weekend", "Holidays"]
 const categories = ["Drinks", "Appetizers", "Sea Food", "House", "Holidays"]
 
 const schema = z.object({
-  menuName: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
-  sellingPrice: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: "Must be a valid number",
-  }),
-  prepareTime: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: "Must be a valid duration",
-  }),
+  dish: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
+  sellPrice: z.number().min(1),
+  prepareTime: z.number().min(1),
 })
 
 const BasicDetails = ({ onNext, onBack }) => {
@@ -47,12 +44,20 @@ const BasicDetails = ({ onNext, onBack }) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) })
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      sellPrice: menuDetails.sellPrice || 0.0,
+      prepareTime: menuDetails.prepareTime || 0.0,
+    },
+  })
 
   const onSubmit = async (data) => {
+    if (!avatar) return toast.error("Select product photo.")
     // console.log(data)
-    setMenuDetails({ ...menuDetails, ...data, avatar })
+    setMenuDetails({ ...data, avatar, season, category })
     onNext()
   }
 
@@ -113,11 +118,11 @@ const BasicDetails = ({ onNext, onBack }) => {
             <Input
               type="text"
               label="Menu Item Name"
-              autoComplete="menuName"
+              autoComplete="dish"
               className="w-[350px]"
-              defaultValue={menuDetails.menuName || ""}
-              {...register("menuName")}
-              error={errors.menuName}
+              defaultValue={menuDetails.dish || ""}
+              {...register("dish")}
+              error={errors.dish}
             />
 
             <div className=" bg-background rounded-2xl h-12 relative focus-within:ring-2 focus-within:ring-accent flex items-center">
@@ -148,26 +153,47 @@ const BasicDetails = ({ onNext, onBack }) => {
 
         <div className="flex gap-4 justify-between">
           <div className="relative self-end">
-            <Input
-              type="number"
-              label="Selling Price"
-              className="w-56"
-              defaultValue={menuDetails.sellingPrice || ""}
-              {...register("sellingPrice")}
-              error={errors.sellingPrice}
+            <Controller
+              name="sellPrice"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <Input
+                    type="Number"
+                    {...field}
+                    label="Selling Price"
+                    className="w-56"
+                    value={field.value}
+                    onChange={(e) =>
+                      field.onChange(parseFloat(e.target.value) || 0)
+                    }
+                    error={errors.sellPrice}
+                  />
+                )
+              }}
             />
             <span className="absolute text-sm top-4 right-6">AUD</span>
           </div>
 
           <div className="relative self-end">
-            <Input
-              type="number"
-              label="Preparing Time"
-              autoComplete="prepareTime"
-              className="w-64"
-              defaultValue={menuDetails.prepareTime || ""}
-              {...register("prepareTime")}
-              error={errors.prepareTime}
+            <Controller
+              name="prepareTime"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <Input
+                    type="Number"
+                    {...field}
+                    label="Preparing Time"
+                    className="w-56"
+                    value={field.value}
+                    onChange={(e) =>
+                      field.onChange(parseFloat(e.target.value) || 0)
+                    }
+                    error={errors.prepareTime}
+                  />
+                )
+              }}
             />
             <span className="absolute text-sm top-4 right-6">Minutes</span>
           </div>
