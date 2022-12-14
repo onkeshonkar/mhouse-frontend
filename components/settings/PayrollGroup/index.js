@@ -51,9 +51,12 @@ const PayrollGroup = () => {
       toast.success("Payroll group added")
       mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
-      toast.error(message)
-      console.log(error)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     setIsAddPayrollModal(false)
   }
@@ -69,8 +72,12 @@ const PayrollGroup = () => {
       toast.success("Payroll group updated")
       mutate()
     } catch (error) {
-      const { message } = error?.response?.data || ""
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
       console.log(error)
     }
     setIsEditPayrollModal(false)
@@ -84,9 +91,12 @@ const PayrollGroup = () => {
       toast.success("Payroll group Deleted")
       mutate()
     } catch (error) {
-      const { message } = error?.response?.data || message
-      toast.error(message)
-      console.log(error)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     setIsDeletePayrollModal(false)
   }

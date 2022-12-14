@@ -49,7 +49,16 @@ const Task = () => {
       route.back()
       mutate()
     } catch (error) {
-      toast.error(error.response?.data?.message || "something went wrong")
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        if (error.code === "ERR_NETWORK") {
+          toast.error(error.message)
+        } else {
+          const { message } = error?.response?.data || "Something went wrong"
+          toast.error(message)
+        }
+      }
     }
   }
 

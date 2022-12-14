@@ -31,7 +31,12 @@ const FundTransfer = () => {
       )
       toast.success("Transfer status updated.")
     } catch (error) {
-      toast.error(error.response?.data?.message || "something went wrong")
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     mutate()
   }
@@ -53,7 +58,6 @@ const FundTransfer = () => {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      toast.error(JSON.stringify(error))
       return <span>{"Can't fetch transfered funds"}</span>
     }
   }

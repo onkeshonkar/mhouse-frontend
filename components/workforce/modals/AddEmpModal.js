@@ -95,9 +95,12 @@ const AddEmpModal = ({ onCancel }) => {
       clearEmpStore()
       toast.success("Emplyoyee docs uploaded")
     } catch (error) {
-      const { message } = error?.response?.data || error
-      toast.error(message, { duration: 7000 })
-      console.log(error)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
 
     onCancel()

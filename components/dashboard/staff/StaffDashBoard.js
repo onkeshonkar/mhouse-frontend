@@ -13,7 +13,6 @@ import {
 } from "chart.js"
 import { Line } from "react-chartjs-2"
 import TodaysTask from "../TodaysTask"
-import ProfitGraph from "../admin/ProfitGraph"
 import Roster from "./Roster"
 
 ChartJS.register(

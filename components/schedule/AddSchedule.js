@@ -60,7 +60,12 @@ const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
       toast.success("Roster added")
       return reloadSchedule()
     } catch (error) {
-      toast.error(error.response.data.message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
       setLoading(false)
     }
   }

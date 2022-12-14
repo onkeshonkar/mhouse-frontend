@@ -129,9 +129,12 @@ const EditEmpModal = ({ onCancel, emp }) => {
       )
       toast.success("Employee updated")
     } catch (error) {
-      const { message } = error?.response?.data || error
-      toast.error(message, { duration: 7000 })
-      console.log(error)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     setLoading(false)
     onCancel()

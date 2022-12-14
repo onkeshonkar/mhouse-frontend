@@ -23,7 +23,6 @@ const SafeDeposit = () => {
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
-      toast.error(error.message)
     } else {
       return <span>{"Can't fetch safe deposits"}</span>
     }

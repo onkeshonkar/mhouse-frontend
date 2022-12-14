@@ -30,7 +30,12 @@ const RegisterNewCash = ({ onClose, mutate }) => {
       )
       toast.success("Cash registered")
     } catch (error) {
-      toast.error(error.response?.data?.message || "something went wrong")
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     mutate()
     onClose()

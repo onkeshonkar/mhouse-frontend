@@ -8,7 +8,6 @@ import { Check } from "../icons"
 import Spinner from "../ui/Spinner"
 
 const Budget = ({ week }) => {
-  console.log(week)
   const updateBudget = (e) => {
     const i = e.currentTarget.name
     const date = dayjs(week).add(i, "days").format("YYYY-MM-DD")
@@ -27,7 +26,6 @@ const Budget = ({ week }) => {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      toast.error(JSON.stringify(error))
       return <span>{"Can't fetch employee list"}</span>
     }
   }

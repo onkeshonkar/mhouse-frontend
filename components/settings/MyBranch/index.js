@@ -64,8 +64,12 @@ const MyBranch = () => {
       toast.success("Branch updated")
       await mutate()
     } catch (error) {
-      const { message } = error?.response?.data || "Can't update Branch"
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
       console.log(JSON.stringify(error))
     }
     setIsEditBranchModal(!isEditBranchModal)
@@ -80,8 +84,12 @@ const MyBranch = () => {
       toast.success("Branch Deleted")
       await mutate()
     } catch (error) {
-      const { message } = error?.response?.data || error
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
 
     setIsDeleteBranchModal(!isDeleteBranchModal)

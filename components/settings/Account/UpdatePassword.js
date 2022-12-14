@@ -50,8 +50,12 @@ const UpdatePassword = () => {
       setLoading(false)
     } catch (error) {
       setLoading(false)
-      const { message } = error?.response?.data || error
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
   }
 

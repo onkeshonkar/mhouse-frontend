@@ -39,8 +39,12 @@ const MyTeam = () => {
       toast.success("Emplyoyee permissions updated")
       await mutate()
     } catch (error) {
-      const { message } = error?.response?.data || error
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     setIsUpdateTeamModal(false)
     setSelectedMember(undefined)

@@ -59,7 +59,12 @@ const RegisterNewClosing = ({ onClose, mutate }) => {
       await APIService.post(`/v1/branches/${selectedBranch.id}/closings`, data)
       toast.success("closing added")
     } catch (error) {
-      toast.error(error.response?.data?.message || "something went wrong")
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
     mutate()
     onClose()

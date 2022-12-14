@@ -69,8 +69,12 @@ const Signup = () => {
       setSelectedBranch(user.branch)
       router.replace("/dashboard")
     } catch (error) {
-      const { message } = error.response?.data
-      toast.error(message)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
       setLoading(false)
     }
   }
@@ -99,10 +103,12 @@ const Signup = () => {
       setShowOtpBox(true)
     } catch (error) {
       setLoading(false)
-      const { message } =
-        error?.response?.data || "Something went Wrong on server"
-      toast.error(message)
-      console.log(error)
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message)
+      } else {
+        const { message } = error?.response?.data || "Something went wrong"
+        toast.error(message)
+      }
     }
   }
 
