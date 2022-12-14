@@ -142,14 +142,14 @@ const StaffDashBoard = () => {
       <Roster />
 
       <div className="flex gap-4 mt-4">
-        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">
+        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full overflow-y-auto">
           <TodaysTask />
         </div>
 
         <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">
           <Tab.Group>
             <div className="flex justify-between items-center mb-5">
-              <h3 className="font-bold text-2xl">Employee Payroll</h3>
+              <h3 className="font-bold text-2xl">Your Payroll</h3>
 
               <Tab.List className="bg-background rounded-md">
                 {graphTypes.map((type) => (

@@ -1,8 +1,14 @@
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
+import useSWR from "swr"
+import { fetcher } from "../../../lib/axios"
+import useUserStore from "../../../stores/useUserStore"
 import { Chevron, PartialCloud } from "../../icons"
+import Spinner from "../../ui/Spinner"
 
 const Roster = () => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"))
 
   const [weekStart, weekEnd] = useMemo(() => {
@@ -11,6 +17,32 @@ const Roster = () => {
       dayjs(date).day(6).format("MMM D, YYYY"),
     ]
   }, [date])
+
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/schedules?type=week&date=${date}&employee=${user.employeeId}`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
+
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return <span>{"Can't fetch your schedule"}</span>
+    }
+  }
+  console.log(data)
+
+  // if (!data)
+  //   return (
+  //     <div className="mt-10 text-center">
+  //       <Spinner />
+  //     </div>
+  //   )
+
+  const schedules = data?.schedules
 
   return (
     <div className="flex justify-between ">
@@ -94,18 +126,56 @@ const Roster = () => {
         </div>
 
         <div className="flex justify-between items-center">
-          {new Array(7).fill("").map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-lg w-[138px] h-44 flex items-center justify-center"
-            >
-              <div className="flex flex-col items-center text-xs">
-                <span>9:90 am</span>
-                <span>-</span>
-                <span>9:90 pm</span>
-              </div>
+          {!schedules && (
+            <div className="mx-auto h-44">
+              <Spinner />
             </div>
-          ))}
+          )}
+
+          {schedules &&
+            new Array(7).fill("").map((_, i) => {
+              const schedule = schedules.find((sch) => {
+                return dayjs(sch.scheduledDate).day() === i
+              })
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-lg w-[138px] h-44 flex items-center justify-center"
+                >
+                  <div className="flex flex-col items-center text-xs">
+                    {schedule && !schedule.leaveType && (
+                      <>
+                        <span>{schedule.scheduledSlot[0]}</span>
+                        <span>-</span>
+                        <span>{schedule.scheduledSlot[1]}</span>
+                      </>
+                    )}
+
+                    {schedule && schedule.leaveType && (
+                      <>
+                        {schedule.leaveType === "Unpaid Leave" && (
+                          <span className="bg-[#EBFBF5] text-x-green px-3 py-1.5 rounded-3xl">
+                            {schedule.leaveType}
+                          </span>
+                        )}
+                        {schedule.leaveType === "Annual Leave" && (
+                          <span className="bg-[#FFF9EC] text-accent px-3 py-1.5 rounded-3xl">
+                            {schedule.leaveType}
+                          </span>
+                        )}
+                        {schedule.leaveType === "Sick Leave" && (
+                          <span className="bg-[#FFEEEE] text-x-red px-3 py-1.5 rounded-3xl">
+                            {schedule.leaveType}
+                          </span>
+                        )}
+                      </>
+                    )}
+
+                    {!schedule && <span className="opacity-70">no roster</span>}
+                  </div>
+                </div>
+              )
+            })}
         </div>
       </div>
     </div>

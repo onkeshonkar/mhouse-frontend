@@ -20,6 +20,7 @@ const Checklist = ({ task, mutate }) => {
       toast.error(error.response?.data?.message || "something went wrong")
     }
   }
+
   return (
     <div className="flex flex-col gap-1.5 text-sm font-light">
       {task?.checkList.map((item) => {
