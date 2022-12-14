@@ -28,10 +28,10 @@ const schema = z.object({
 })
 
 const ClientDetails = ({ onNext, onBack }) => {
-  const { orderDetail, setOrderDetails } = useContext(CateringOrderContext)
+  const { orderDetails, setOrderDetails } = useContext(CateringOrderContext)
 
   const [deliveryMethod, setDeliveryMethod] = useState(
-    orderDetail.deliveryMethod || deliveryMethods[0]
+    orderDetails.deliveryMethod || deliveryMethods[0]
   )
 
   const { file, onDiscard, onSelect } = useFileReader(
@@ -39,11 +39,11 @@ const ClientDetails = ({ onNext, onBack }) => {
   )
   const avatar = useMemo(() => {
     if (file) return file
-    if (orderDetail.avatar) {
-      return orderDetail.avatar
+    if (orderDetails.avatar) {
+      return orderDetails.avatar
     }
     return ""
-  }, [file, orderDetail])
+  }, [file, orderDetails])
 
   const {
     register,
@@ -53,7 +53,7 @@ const ClientDetails = ({ onNext, onBack }) => {
 
   const onSubmit = async (data) => {
     // console.log(data)
-    setOrderDetails({ ...orderDetail, ...data, avatar, deliveryMethod })
+    setOrderDetails({ ...orderDetails, ...data, avatar, deliveryMethod })
     onNext()
   }
 
@@ -115,7 +115,7 @@ const ClientDetails = ({ onNext, onBack }) => {
               label="Client Full Name"
               autoComplete="fullName"
               className="w-[350px]"
-              defaultValue={orderDetail.fullName || ""}
+              defaultValue={orderDetails.fullName || ""}
               {...register("fullName")}
               error={errors.fullName}
             />
@@ -124,7 +124,7 @@ const ClientDetails = ({ onNext, onBack }) => {
               autoComplete="phoneNumber"
               className="w-[350px]"
               label="Client Phone Number"
-              defaultValue={orderDetail.phoneNumber || "+61"}
+              defaultValue={orderDetails.phoneNumber || "+61"}
               {...register("phoneNumber")}
               error={errors.phoneNumber}
             />
@@ -136,7 +136,7 @@ const ClientDetails = ({ onNext, onBack }) => {
           label="Full Address"
           autoComplete="fullAddress"
           className="w-full"
-          defaultValue={orderDetail.fullAddress || ""}
+          defaultValue={orderDetails.fullAddress || ""}
           {...register("fullAddress")}
           error={errors.fullAddress}
         />
@@ -157,8 +157,8 @@ const ClientDetails = ({ onNext, onBack }) => {
             autoComplete="deliveryDate"
             className="w-64"
             defaultValue={
-              (orderDetail.deliveryDate &&
-                dayjs(orderDetail.deliveryDate).format("YYYY-MM-DD")) ||
+              (orderDetails.deliveryDate &&
+                dayjs(orderDetails.deliveryDate).format("YYYY-MM-DD")) ||
               dayjs().format("YYYY-MM-DD")
             }
             {...register("deliveryDate")}
@@ -169,7 +169,7 @@ const ClientDetails = ({ onNext, onBack }) => {
             label="Delivery Time"
             autoComplete="deliveryTime"
             className="w-64"
-            defaultValue={orderDetail.deliveryTime || ""}
+            defaultValue={orderDetails.deliveryTime || ""}
             {...register("deliveryTime")}
             error={errors.deliveryTime}
           />

@@ -1,46 +1,44 @@
 import { useContext, useEffect, useRef, useState } from "react"
+import { toast } from "react-hot-toast"
+import useSWR from "swr"
 import { CateringOrderContext } from "../../context/CateringContext"
+import { fetcher } from "../../lib/axios"
+import useUserStore from "../../stores/useUserStore"
 
 import { Arrow, Delete, Plus, Search } from "../icons"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
 import RadioInput from "../ui/RadioInput"
+import Spinner from "../ui/Spinner"
 import TextArea from "../ui/TextArea"
 
-const menus = [
-  {
-    id: "631",
-    name: "Pizza Margarita",
-    sellPrice: 20,
-  },
-  {
-    id: "631f",
-    name: "Pizza Chiken",
-    sellPrice: 48,
-  },
-  {
-    id: "631f2",
-    name: "Chawmin",
-    sellPrice: 50,
-  },
-]
+const paymentMethods = ["Cash", "Eftpos", "Credit"]
 
-const paymentTypes = ["Cash", "Eftpos", "Credit"]
-
-const OrderDetails = ({ onNext, onBack }) => {
-  const { orderDetail, setOrderDetails } = useContext(CateringOrderContext)
+const OrderDetails = ({ handleSubmit, onBack }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const { orderDetails, setOrderDetails } = useContext(CateringOrderContext)
 
   const [query, setQuery] = useState("")
-  const [paymentType, setPaymentType] = useState(
-    orderDetail.paymentType || paymentTypes[0]
+  const [paymentMethod, setPaymentMethod] = useState(
+    orderDetails.paymentMethod || paymentMethods[0]
   )
-  const [upfront, setUpfront] = useState(orderDetail.upfront || 0)
-  const [note, setNote] = useState(orderDetail.note || "")
-  const [cart, setCart] = useState(orderDetail.cart || [])
+  const [upfrontPayment, setUpfrontPayment] = useState(
+    orderDetails.upfrontPayment || 0
+  )
+  const [notes, setNotes] = useState(orderDetails.notes || "")
+  const [cart, setCart] = useState(orderDetails.cart || [])
   const [showMenuList, setShowMenuList] = useState(false)
 
   const divRef = useRef()
   const inputRef = useRef()
+
+  const { data, error } = useSWR(
+    `/v1/branches/${selectedBranch.id}/menu?meta=false`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -56,40 +54,63 @@ const OrderDetails = ({ onNext, onBack }) => {
   }, [])
 
   useEffect(() => {
-    inputRef.current.focus()
+    inputRef.current?.focus()
     setShowMenuList(true)
   }, [])
 
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return <span>{"Can't fetch menu list"}</span>
+    }
+  }
+
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
+
+  const { menu } = data
+
   const filteredMenu =
     query === ""
-      ? menus
-      : menus.filter((menuItem) => {
+      ? menu
+      : menu.filter((menuItem) => {
           return menuItem.name.toLowerCase().includes(query.toLowerCase())
         })
 
   const cartAmount = cart.reduce((acc, cartItem) => {
-    return acc + cartItem.sellPrice * cartItem.qty
+    return acc + cartItem.sellPrice * cartItem.quantity
   }, 0)
 
   const onSubmit = () => {
     setOrderDetails({
-      ...orderDetail,
-      paymentType,
-      upfront,
-      note,
+      ...orderDetails,
+      paymentMethod,
+      upfrontPayment,
+      notes,
       cart,
     })
-    onBack()
+    handleSubmit({
+      ...orderDetails,
+      paymentMethod,
+      upfrontPayment,
+      notes,
+      cart,
+    })
   }
 
   const addMenuToCart = (e) => {
     const menuId = e.currentTarget.name
-    const foundMenu = menus.find((m) => m.id === menuId)
+    const foundMenu = menu.find((m) => m.id === menuId)
     setCart((prevCart) => {
-      if (!prevCart.length) return [{ ...foundMenu, qty: 1 }]
+      if (!prevCart.length) return [{ ...foundMenu, quantity: 1 }]
       const cartMenu = prevCart.find((m) => m.id === menuId)
-      if (cartMenu) cartMenu.qty++
-      else prevCart.push({ ...foundMenu, qty: 1 })
+      if (cartMenu) cartMenu.quantity++
+      else prevCart.push({ ...foundMenu, quantity: 1 })
       return [...prevCart]
     })
   }
@@ -106,7 +127,7 @@ const OrderDetails = ({ onNext, onBack }) => {
             <div className="relative">
               <Input
                 type="text"
-                label="Search Item"
+                label="Search Menu"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full"
@@ -140,7 +161,7 @@ const OrderDetails = ({ onNext, onBack }) => {
                     ADD
                   </button>
 
-                  <span>{menuItem.name}</span>
+                  <span>{menuItem.dish}</span>
                   <span className="text-xs -ml-2 opacity-70 text-x-green">
                     ( {menuItem.sellPrice} $)
                   </span>
@@ -152,25 +173,25 @@ const OrderDetails = ({ onNext, onBack }) => {
           <div className="flex flex-col gap-6 self-end">
             <div className="relative self-end">
               <Input
-                type="number"
-                label="Upfront Paid"
+                type="Number"
+                label="upfrontPayment Paid"
                 className="w-56"
-                value={upfront}
-                onChange={(e) => setUpfront(e.target.value)}
+                value={upfrontPayment}
+                onChange={(e) => setUpfrontPayment(e.target.valueAsNumber || 0)}
               />
               <span className="absolute text-sm top-4 right-6">AUD</span>
             </div>
 
             <RadioInput
-              value={paymentType}
-              options={paymentTypes}
-              onChange={setPaymentType}
+              value={paymentMethod}
+              options={paymentMethods}
+              onChange={setPaymentMethod}
             />
 
             <TextArea
               label="Notes"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             />
           </div>
         </div>
@@ -188,8 +209,8 @@ const OrderDetails = ({ onNext, onBack }) => {
                     ( {cartItem.sellPrice} $)
                   </span>
                 </div>
-                <span>{cartItem.qty} </span>
-                <span>{cartItem.sellPrice * cartItem.qty} $</span>
+                <span>{cartItem.quantity} </span>
+                <span>{cartItem.sellPrice * cartItem.quantity} $</span>
                 <Delete width={16} height={16} className="text-x-red" />
               </li>
             ))}
@@ -210,7 +231,7 @@ const OrderDetails = ({ onNext, onBack }) => {
                     scope="col"
                     className="text-sm text-primary font-normal text-left px-5 py-2"
                   >
-                    Qty
+                    quantity
                   </th>
 
                   <th
@@ -233,30 +254,30 @@ const OrderDetails = ({ onNext, onBack }) => {
                   <tr key={cartItem.id}>
                     <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
                       <div className="flex flex-col gap-2 col-span-2">
-                        <span className="text-sm">{cartItem.name}</span>
+                        <span className="text-sm">{cartItem.dish}</span>
                         <span className="text-xs opacity-80">
                           ( {cartItem.sellPrice} $)
                         </span>
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
-                      {cartItem.qty}
+                      {cartItem.quantity}
                     </td>
                     {/* <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
                       <input
                         type={"number"}
                         className="block text-center w-16 px-5 py-2.5 text-sm bg-background outline-none focus:ring-2 ring-accent rounded-2xl"
-                        value={cartItem.qty}
+                        value={cartItem.quantity}
                         onChange={(e) => {
-                          const qty = parseInt(e.target.value)
-                          if (isNaN(qty)) return
+                          const quantity = parseInt(e.target.value)
+                          if (isNaN(quantity)) return
 
                           setCart((prevCart) => {
                             return prevCart.map((item) => {
                               if (item.id == cartItem.id)
                                 return {
                                   ...item,
-                                  qty,
+                                  quantity,
                                 }
                               else return { ...item }
                             })
@@ -266,7 +287,7 @@ const OrderDetails = ({ onNext, onBack }) => {
                     </td> */}
 
                     <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-normal ">
-                      {cartItem.sellPrice * cartItem.qty} $
+                      {cartItem.sellPrice * cartItem.quantity} $
                     </td>
 
                     <td className="whitespace-nowrap px-5 py-1 text-sm text-primary font-bold">

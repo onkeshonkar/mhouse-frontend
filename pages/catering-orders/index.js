@@ -13,92 +13,47 @@ import TooltipButton from "../../components/ui/ToolTipButton"
 import { fetcher } from "../../lib/axios"
 import useUserStore from "../../stores/useUserStore"
 
-const cateringOrders = [
-  {
-    id: "631f2df5378e719aafc43e7",
-    clientName: "Random user",
-    deliveryDate: "2022-09-19T16:27:22.329Z",
-    bookedBy: {
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar315@gmail.com",
-      id: "631f2df5378e719aafc43e77",
-    },
-    aprovedBy: {
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar315@gmail.com",
-      id: "631f2df5378e719aafc43e77",
-    },
-    paymnetMethod: "Cash",
-    deliveryMethod: "Pickup",
-    status: "Pending",
-  },
-  {
-    id: "631f2df5378e719aafc43e7c",
-    clientName: "Random user2",
-    deliveryDate: "2022-07-19T16:27:22.329Z",
-    bookedBy: {
-      fullName: "kumar",
-      email: "onkeshkumaronkar315@gmail.com",
-      id: "631f2df5378e719aafc43e77",
-    },
-    aprovedBy: {
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar315@gmail.com",
-      id: "631f2df5378e719aafc43e77",
-    },
-    paymnetMethod: "Credit",
-    deliveryMethod: "Pickup",
-    status: "Canceled",
-  },
-  {
-    id: "631f2df5378e714aafc43e7b",
-    clientName: "Random user",
-    deliveryDate: "2022-09-19T16:27:22.329Z",
-    bookedBy: {
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar315@gmail.com",
-      id: "631f2df5378e719aafc43e77",
-    },
-    aprovedBy: null,
-    paymnetMethod: "Eftpos",
-    deliveryMethod: "Delivery",
-    status: "Completed",
-  },
-]
-
 const CateringOrders = () => {
   const [isAddCatering, setIsAddCatering] = useState(false)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  // const { data, error, mutate } = useSWR(
-  //   `/v1/branches/${selectedBranch.id}/catering-orders`,
-  //   fetcher
-  // )
+  const { data, error, mutate } = useSWR(
+    `/v1/branches/${selectedBranch.id}/catering-orders`,
+    fetcher,
+    {
+      errorRetryCount: 2,
+    }
+  )
 
-  // if (error) {
-  //   if (error.code === "ERR_NETWORK") {
-  //     toast.error(error.message)
-  //   } else {
-  //     return <span>{"Can't fetch employee list"}</span>
-  //   }
-  // }
+  if (error) {
+    if (error.code === "ERR_NETWORK") {
+      toast.error(error.message)
+    } else {
+      return <span>{"Can't fetch catering orders"}</span>
+    }
+  }
 
-  // if (!data)
-  //   return (
-  //     <div className="mt-10 text-center">
-  //       <Spinner />
-  //     </div>
-  //   )
+  if (!data)
+    return (
+      <div className="mt-10 text-center">
+        <Spinner />
+      </div>
+    )
 
-  const TOTAL_ORDERS = 26
-  const PENDING_ORDERS = 10
-
-  // const {cateringOrders} = data
+  const { cateringOrders } = data
+  const TOTAL_ORDERS = cateringOrders.length
+  const PENDING_ORDERS = cateringOrders.reduce((prevVal, currVal) => {
+    if (currVal.status === "Delivered") return prevVal + 1
+    return prevVal
+  }, 0)
 
   return (
     <>
       {isAddCatering && (
-        <AddCateringModal onClose={() => setIsAddCatering(false)} />
+        <AddCateringModal
+          onClose={() => setIsAddCatering(false)}
+          mutate={mutate}
+        />
       )}
 
       <div className="mt-8 ml-6">
@@ -115,9 +70,9 @@ const CateringOrders = () => {
               <div className="flex items-center justify-between">
                 <p className="text-xs font-normal">Pending Catering Orders</p>
                 <div className="text-base font-bold">
-                  <span className="text-x-green">{TOTAL_ORDERS}</span>
+                  <span className="text-x-green">{PENDING_ORDERS}</span>
                   <span> / </span>
-                  <span>{PENDING_ORDERS}</span>
+                  <span>{TOTAL_ORDERS}</span>
                 </div>
               </div>
 
@@ -167,38 +122,38 @@ const CateringOrders = () => {
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Delivery Date
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Booked by
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Approved By
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Payment
                 </th>
 
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Delivery/Pickup
                 </th>
                 <th
                   scope="col"
-                  className="text-sm text-primary font-normal text-left px-4 py-2"
+                  className="text-sm text-primary font-normal text-center px-4 py-2"
                 >
                   Status
                 </th>
@@ -217,57 +172,64 @@ const CateringOrders = () => {
                     </Link>
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-left">
                     {cateringOrder.clientName}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal opacity-50">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal opacity-50 text-center">
                     {dayjs(cateringOrder.deliveryDate).format("DD MMM YYYY")}
                   </td>
 
                   <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center gap-4">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
                         <Avatar
-                          user={cateringOrder.bookedBy}
+                          user={cateringOrder.createdBy}
                           width={36}
                           height={36}
                         />
                       </div>
-                      {cateringOrder.bookedBy.fullName}
+                      {cateringOrder.createdBy.fullName}
                     </div>
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {cateringOrder.aprovedBy && (
-                      <div className="flex items-center gap-4">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center">
+                    {cateringOrder.updatedBy ? (
+                      <div className="flex items-center justify-center gap-4">
                         <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
                           <Avatar
-                            user={cateringOrder.aprovedBy}
+                            user={cateringOrder.updatedBy}
                             width={36}
                             height={36}
                           />
                         </div>
-                        {cateringOrder.aprovedBy.fullName}
+                        {cateringOrder.updatedBy.fullName}
                       </div>
+                    ) : (
+                      <spna>----</spna>
                     )}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {cateringOrder.paymnetMethod}
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center ">
+                    <div className="flex flex-col">
+                      <span> {cateringOrder.paymentMethod}</span>
+                      <span className="text-xs opacity-70">
+                        ($ {cateringOrder.orderAmount})
+                      </span>
+                    </div>
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center ">
                     {cateringOrder.deliveryMethod}
                   </td>
 
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal">
-                    {cateringOrder.status === "Completed" && (
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal text-center">
+                    {cateringOrder.status === "Open" && (
                       <span className="bg-[#EBFBF5] text-x-green px-3 py-1.5 rounded-3xl">
                         {cateringOrder.status}
                       </span>
                     )}
-                    {cateringOrder.status === "Pending" && (
+                    {cateringOrder.status === "Delivered" && (
                       <span className="bg-[#FFF9EC] text-accent px-3 py-1.5 rounded-3xl">
                         {cateringOrder.status}
                       </span>

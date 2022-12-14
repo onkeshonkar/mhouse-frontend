@@ -1,16 +1,48 @@
 import { useState } from "react"
+import { toast } from "react-hot-toast"
 
 import { CateringOrderProvider } from "../../context/CateringContext"
+import { APIService } from "../../lib/axios"
+import useUserStore from "../../stores/useUserStore"
 import { Close } from "../icons"
 
 import Modal from "../ui/Modal"
 import ClientDetails from "./ClientDetails"
 import OrderDetails from "./OrderDetails"
 
-const AddCateringModal = ({ onClose }) => {
+const AddCateringModal = ({ onClose, mutate }) => {
+  const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [currPage, setCurrPage] = useState(1)
 
-  const handleSubmit = () => {
+  const handleSubmit = async (orderDetails) => {
+    const data = {
+      clientName: orderDetails.fullName,
+      phoneNumber: orderDetails.phoneNumber,
+      fullAddress: orderDetails.fullAddress,
+      deliveryMethod: orderDetails.deliveryMethod,
+      deliveryDate: orderDetails.deliveryDate,
+      paymentMethod: orderDetails.paymentMethod,
+      upfrontPayment: orderDetails.upfrontPayment,
+      ...(orderDetails.notes && { notes: orderDetails.notes }),
+      cart: orderDetails.cart.map((item) => ({
+        menu: item.id,
+        dish: item.dish,
+        sellPrice: item.sellPrice,
+        quantity: item.quantity,
+      })),
+    }
+
+    try {
+      await APIService.post(
+        `/v1/branches/${selectedBranch.id}/catering-orders`,
+        data
+      )
+      toast.success("Order created")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong")
+    }
+
+    mutate()
     onClose()
   }
 
@@ -27,7 +59,10 @@ const AddCateringModal = ({ onClose }) => {
           )}
 
           {currPage === 2 && (
-            <OrderDetails onBack={() => setCurrPage(1)} onNext={onClose} />
+            <OrderDetails
+              onBack={() => setCurrPage(1)}
+              handleSubmit={handleSubmit}
+            />
           )}
         </CateringOrderProvider>
       </div>
