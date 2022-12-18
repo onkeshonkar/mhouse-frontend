@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import useSWRImmutable from "swr/immutable"
 
+import { mutate } from "swr"
 import { Plus, Edit, Delete } from "../../icons"
 import Button from "../../ui/Button"
 import useUserStore from "../../../stores/useUserStore"
@@ -10,6 +11,7 @@ import BranchModal from "./BranchModal"
 import ConfirmModal from "../../ui/ConfirmModal"
 import toast from "react-hot-toast"
 import Spinner from "../../ui/Spinner"
+import Modal from "../../ui/Modal"
 
 const MyBranch = () => {
   const [isAddBranchModal, setIsAddBranchModal] = useState(false)
@@ -19,7 +21,11 @@ const MyBranch = () => {
 
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  const { data, error, mutate } = useSWRImmutable(
+  const {
+    data,
+    error,
+    mutate: mutateBranch,
+  } = useSWRImmutable(
     `/v1/restaurents/${selectedBranch.restaurent}/branches?manager=true`,
     fetcher
   )
@@ -46,7 +52,10 @@ const MyBranch = () => {
         { ...data }
       )
       toast.success("Branch added")
-      mutate()
+      mutateBranch()
+      mutate(
+        `/v1/restaurents/${selectedBranch.restaurent}/branches?details=semi`
+      )
     } catch (error) {
       const { message } = error?.response?.data || "Can't add Branch"
       toast.error(message)
@@ -62,7 +71,10 @@ const MyBranch = () => {
         { ...branch }
       )
       toast.success("Branch updated")
-      await mutate()
+      await mutateBranch()
+      mutate(
+        `/v1/restaurents/${selectedBranch.restaurent}/branches?details=semi`
+      )
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
         toast.error(error.message)
@@ -82,7 +94,7 @@ const MyBranch = () => {
         `/v1/restaurents/${selectedBranch.restaurent}/branches/${branchToModify.id}`
       )
       toast.success("Branch Deleted")
-      await mutate()
+      await mutateBranch()
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
         toast.error(error.message)
@@ -107,27 +119,27 @@ const MyBranch = () => {
 
   return (
     <>
-      {isAddBranchModal && (
+      <Modal open={isAddBranchModal}>
         <BranchModal
           onClose={() => setIsAddBranchModal(false)}
           onSubmitBranch={handleAddBranch}
         />
-      )}
+      </Modal>
 
-      {isEditBranchModal && (
+      <Modal open={isEditBranchModal}>
         <BranchModal
           branch={branchToModify}
           onClose={() => setIsEditBranchModal(false)}
           onSubmitBranch={handleEditBranch}
         />
-      )}
+      </Modal>
 
-      {isDeleteBranchModal && (
+      <Modal open={isDeleteBranchModal}>
         <ConfirmModal
           onConfirm={handleDeleteBranch}
           onClose={() => setIsDeleteBranchModal(false)}
         />
-      )}
+      </Modal>
 
       <div className="relative">
         <div className=" absolute right-4 -top-20">

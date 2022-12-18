@@ -8,17 +8,21 @@ import useUserStore from "../../../stores/useUserStore"
 import { Check, Close, Filter, Paper, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
 import Button from "../../ui/Button"
+import Modal from "../../ui/Modal"
 import Spinner from "../../ui/Spinner"
 import TooltipButton from "../../ui/ToolTipButton"
 import AddFundTransfer from "./AddFundTransfer"
 
 const FundTransfer = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [isAddNewTransfer, setIsAddNewTransfer] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/fund-transfers`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["FUND_TRANSFER"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/fund-transfers`
+      : null,
     fetcher
   )
 
@@ -54,11 +58,23 @@ const FundTransfer = () => {
     mutate()
   }
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch transfered funds"}</span>
+      return (
+        <div className="mt-10 text-center">
+          {"Can't fetch transfered funds"}
+        </div>
+      )
     }
   }
 
@@ -69,19 +85,26 @@ const FundTransfer = () => {
       </div>
     )
 
+  const totaltransfer = data.fundTransfers.reduce((prev, curr) => {
+    return prev + (curr.status === "Approved" ? curr.amount : 0)
+  }, 0)
+
   return (
     <>
-      {isAddNewTransfer && (
+      <Modal open={isAddNewTransfer} transparent={false}>
         <AddFundTransfer
           onClose={() => setIsAddNewTransfer(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
+
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Finance Management</h1>
-            <p className="text-sm font-light">60K $ Total Transferred</p>
+            <p className="text-sm font-light">
+              $ {totaltransfer} Total Transferred
+            </p>
           </div>
 
           <div className="flex gap-6">
@@ -93,10 +116,13 @@ const FundTransfer = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddNewTransfer(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Transfer</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["FUND_TRANSFER"].includes("add")) && (
+              <Button onClick={() => setIsAddNewTransfer(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Transfer</span>
+              </Button>
+            )}
           </div>
         </header>
 

@@ -40,19 +40,28 @@ function classNames(...classes) {
 
 const Employee = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const route = useRouter()
   const empId = route.query.empId
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/employees/${empId}`,
+  const { data, error, isLoading } = useSWR(
+    user.type === "OWNER" || user.roles.access["WORKFORCE"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/employees/${empId}`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
     }
   )
 
-  const onEditEmp = (e) => {}
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {

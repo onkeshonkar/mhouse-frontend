@@ -68,7 +68,7 @@ const JobDetails = ({ onBack, onNext, onCancel }) => {
         <div className="flex gap-4 mt-2 justify-between w-full px-16">
           <div className="bg-background rounded-xl w-52 h-12 flex items-center justify-between px-6 text-sm">
             <span className="opacity-50">
-              {(data && data.restaurent.payrollId) || "updating.."}
+              {data && data.restaurent.payrollId + 1}
             </span>
             <span>Payroll ID</span>
           </div>

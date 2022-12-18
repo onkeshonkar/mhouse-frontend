@@ -7,24 +7,38 @@ import useUserStore from "../../../stores/useUserStore"
 import { Draft, Filter, Paper, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
 import Button from "../../ui/Button"
+import Modal from "../../ui/Modal"
 import Spinner from "../../ui/Spinner"
 import TooltipButton from "../../ui/ToolTipButton"
 import RegisterNewSafe from "./RegisterNewSafe"
 
 const SafeDeposit = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [isAddNewSafe, setIsAddNewSafe] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/safe-deposits`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["SAFE_DEPOSIT"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/safe-deposits`
+      : null,
     fetcher
   )
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
     } else {
-      return <span>{"Can't fetch safe deposits"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch safe deposits"}</div>
+      )
     }
   }
 
@@ -35,19 +49,24 @@ const SafeDeposit = () => {
       </div>
     )
 
+  const totalInSafe = data.safeDeposits.reduce((prev, curr) => {
+    return prev + curr.totalAmount
+  }, 0)
+
   return (
     <>
-      {isAddNewSafe && (
+      <Modal open={isAddNewSafe} transparent={false}>
         <RegisterNewSafe
           onClose={() => setIsAddNewSafe(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
+
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Finance Management</h1>
-            <p className="text-sm font-light">800 $ in Safe Now</p>
+            <p className="text-sm font-light">${totalInSafe} in Safe Now</p>
           </div>
 
           <div className="flex gap-6">
@@ -59,10 +78,13 @@ const SafeDeposit = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddNewSafe(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Deposit</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["SAFE_DEPOSIT"].includes("add")) && (
+              <Button onClick={() => setIsAddNewSafe(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Deposit</span>
+              </Button>
+            )}
           </div>
         </header>
 
@@ -228,6 +250,10 @@ const SafeDeposit = () => {
                   </td>
 
                   <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                    {dayjs(safe.createdAt).format("DD MMM YYYY")}
+                  </td>
+
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
                     <div className="flex items-center gap-4">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
                         <Avatar
@@ -238,10 +264,6 @@ const SafeDeposit = () => {
                       </div>
                       {safe.registeredBy.fullName}
                     </div>
-                  </td>
-
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {dayjs(safe.createdAt).format("DD MMM YYYY")}
                   </td>
 
                   <td className="whitespace-nowrap py-2.5 px-4 text-base text-primary font-medium ">

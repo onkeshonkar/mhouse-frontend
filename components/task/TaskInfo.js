@@ -34,7 +34,7 @@ const TaskInfo = ({ onNext, onCancel }) => {
   })
 
   return (
-    <div className="max-w-8xl min-h-screen flex flex-col relative ">
+    <div className="flex flex-col relative ">
       <button onClick={onCancel} className="absolute right-0 mt-20">
         <Close />
       </button>

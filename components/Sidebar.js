@@ -60,21 +60,6 @@ const SideBar = () => {
           </Link>
         ))}
       </nav>
-
-      {/* <div className="flex flex-col gap-2.5 px-2.5">
-        <button className="flex justify-center gap-4 group-hover:w-[172px] p-2.5 bg-gradient-to-tr from-[#FF974A] to-[#FFBA42] text-white rounded-xl shadow-md shadow-accent transition-all duration-300">
-          <Lock />
-          <span className="hidden group-hover:block relative -left-10 group-hover:translate-x-10 transition-all duration-300 ease-in-out">
-            Others Check
-          </span>
-        </button>
-        <button className="flex justify-center gap-4 group-hover:w-[172px] p-2.5 bg-gradient-to-tr from-[#FF974A] to-[#FFBA42] text-white rounded-xl shadow-md shadow-accent transition-all duration-300">
-          <XCircle />
-          <span className="hidden group-hover:block relative -left-10 group-hover:translate-x-10 transition-all duration-300 ease-in-out">
-            Add New
-          </span>
-        </button>
-      </div> */}
     </div>
   )
 }

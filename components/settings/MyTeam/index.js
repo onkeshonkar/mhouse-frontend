@@ -6,14 +6,15 @@ import { APIService, fetcher } from "../../../lib/axios"
 import useUserStore from "../../../stores/useUserStore"
 
 import { Plus, Edit, Delete } from "../../icons"
+import Modal from "../../ui/Modal"
 import Spinner from "../../ui/Spinner"
 import TeamModal from "./TeamModal"
 
 const MyTeam = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
 
-  const [isUpdateTeamModal, setIsUpdateTeamModal] = useState(false)
   const [selectedMember, setSelectedMember] = useState()
+  const [isUpdateTeamModal, setIsUpdateTeamModal] = useState(false)
 
   const { data, error, mutate } = useSWR(
     `/v1/branches/${selectedBranch.id}/employees`,
@@ -37,7 +38,7 @@ const MyTeam = () => {
         { ...data }
       )
       toast.success("Emplyoyee permissions updated")
-      await mutate()
+      mutate()
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
         toast.error(error.message)
@@ -47,7 +48,6 @@ const MyTeam = () => {
       }
     }
     setIsUpdateTeamModal(false)
-    setSelectedMember(undefined)
   }
 
   if (error) {
@@ -67,13 +67,13 @@ const MyTeam = () => {
 
   return (
     <>
-      {isUpdateTeamModal && (
+      <Modal open={isUpdateTeamModal} transparent={false}>
         <TeamModal
           onClose={() => setIsUpdateTeamModal(false)}
           onSubmitTeam={handleEditTeam}
           emp={selectedMember}
         />
-      )}
+      </Modal>
 
       <div className="relative">
         <div>

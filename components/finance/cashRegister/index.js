@@ -11,22 +11,36 @@ import { fetcher } from "../../../lib/axios"
 import dayjs from "dayjs"
 import Avatar from "../../ui/Avatar"
 import RegisterNewCash from "./RegisterNewCash"
+import Modal from "../../ui/Modal"
 
 const CashRegister = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [isNewCash, setIsNewCash] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/cash-register`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["CASH_REGISTER"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/cash-register`
+      : null,
     fetcher
   )
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch cash registers"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch cash registers"}</div>
+      )
     }
   }
 
@@ -37,17 +51,21 @@ const CashRegister = () => {
       </div>
     )
 
+  const totalCash = data.cashRegisters.reduce((prev, curr) => {
+    return prev + curr.totalAmount
+  }, 0)
+
   return (
     <>
-      {isNewCash && (
+      <Modal open={isNewCash} transparent={false}>
         <RegisterNewCash onClose={() => setIsNewCash(false)} mutate={mutate} />
-      )}
+      </Modal>
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Finance Management</h1>
-            <p className="text-sm font-light">2,467 Total Registered</p>
+            <p className="text-sm font-light">$ {totalCash} Total Registered</p>
           </div>
 
           <div className="flex gap-6">
@@ -59,10 +77,13 @@ const CashRegister = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsNewCash(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Count</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["CASH_REGISTER"].includes("add")) && (
+              <Button onClick={() => setIsNewCash(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Count</span>
+              </Button>
+            )}
           </div>
         </header>
 
@@ -234,6 +255,10 @@ const CashRegister = () => {
                   </td>
 
                   <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
+                    {dayjs(cash.createdAt).format("DD MMM YYYY")}
+                  </td>
+
+                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
                     <div className="flex items-center gap-4">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center bg-sky-500">
                         <Avatar
@@ -244,10 +269,6 @@ const CashRegister = () => {
                       </div>
                       {cash.registeredBy.fullName}
                     </div>
-                  </td>
-
-                  <td className="whitespace-nowrap py-2.5 px-4 text-sm text-primary font-normal ">
-                    {dayjs(cash.createdAt).format("DD MMM YYYY")}
                   </td>
 
                   <td className="whitespace-nowrap py-2.5 px-4 text-base text-primary font-medium ">

@@ -6,62 +6,18 @@ import toast from "react-hot-toast"
 import { Check, Chevron } from "../../icons"
 import Avatar from "../../ui/Avatar"
 import { fetcher } from "../../../lib/axios"
+import Spinner from "../../ui/Spinner"
 
 const SupplierList = ({ value, onChange, placeholder = "" }) => {
   const [query, setQuery] = useState("")
 
   const { data, error } = useSWR(`/v1/user`, fetcher)
 
-  //   if (!data) return null
+  if (!data) return null
 
-  //   if (error) return <span>{JSON.stringify(error)}</span>
+  if (error) return <span>{JSON.stringify(error)}</span>
 
-  //   const { suppliers } = data
-
-  const suppliers = [
-    {
-      id: 123,
-      avatar: "abc",
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar@gmail.com",
-      portalUrl: "abc.com",
-      phone: "+917903123164",
-      officePhone: "+917903123164",
-      fullAddress: "Abc road abc gali",
-      department: "kuch bh",
-      minOrderValue: 12,
-      deliveryFee: 30,
-      totalPurchase: 36,
-    },
-    {
-      id: 223,
-      avatar: "abc",
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar@gmail.com",
-      portalUrl: "abc.com",
-      phone: "+917903123164",
-      officePhone: "+917903123164",
-      fullAddress: "Abc road abc gali",
-      department: "kuch bh",
-      minOrderValue: 12,
-      deliveryFee: 30,
-      totalPurchase: 36,
-    },
-    {
-      id: 323,
-      avatar: "abc",
-      fullName: "Onkesh",
-      email: "onkeshkumaronkar@gmail.com",
-      portalUrl: "abc.com",
-      phone: "+917903123164",
-      officePhone: "+917903123164",
-      fullAddress: "Abc road abc gali",
-      department: "kuch bh",
-      minOrderValue: 12,
-      deliveryFee: 30,
-      totalPurchase: 36,
-    },
-  ]
+  const { suppliers } = data
 
   const filteredSuppliers =
     query === ""
@@ -73,14 +29,14 @@ const SupplierList = ({ value, onChange, placeholder = "" }) => {
           )
         })
 
-  //   if (error) return toast.error(JSON.stringify(error))
+  if (error) return toast.error(JSON.stringify(error))
 
-  //   if (!data)
-  //     return (
-  //       <div className="text-center">
-  //         <Spinner />
-  //       </div>
-  //     )
+  if (!data)
+    return (
+      <div className="text-center">
+        <Spinner />
+      </div>
+    )
 
   return (
     <div className="relative w-full">

@@ -26,7 +26,9 @@ const WeeklySchedule = ({ week }) => {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch employee list"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch employee list"}</div>
+      )
     }
   }
 

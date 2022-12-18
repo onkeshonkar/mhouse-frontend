@@ -17,6 +17,7 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
   const task = useTaskAddStore((store) => store.task)
   const updateTask = useTaskAddStore((store) => store.updateTask)
 
+  const [isLoading, setIsLoading] = useState(false)
   const [isRepeatType, setIsrepaeatType] = useState(task.isRepeatType || false)
   const [repeateDate, setRepeateDate] = useState(task.repeateDate || "")
   const [repeatType, setRepeateType] = useState(
@@ -29,6 +30,7 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
     if (isRepeatType && repeatType === "Monthly" && !repeateDate) {
       return toast.error("Select repeat Date")
     }
+    setIsLoading(true)
     await updateTask({
       departments,
       isRepeatType,
@@ -36,12 +38,12 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
       ...(isRepeatType && repeatType === "Weekly" && { repeatDay }),
       ...(isRepeatType && repeatType === "Monthly" && { repeateDate }),
     })
-
-    onSubmit()
+    await onSubmit()
+    setIsLoading(false)
   }
 
   return (
-    <div className="max-w-8xl min-h-screen flex flex-col relative ">
+    <div className="flex flex-col relative ">
       <button onClick={onCancel} className="absolute right-0 mt-20">
         <Close />
       </button>
@@ -146,7 +148,7 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
             />
           </svg>
         </span>
-        <Button onClick={handleSubmit}>
+        <Button onClick={handleSubmit} loading={isLoading}>
           <span>Next</span>
           <Arrow
             width={20}

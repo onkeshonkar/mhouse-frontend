@@ -9,6 +9,7 @@ import Spinner from "../../ui/Spinner"
 import toast from "react-hot-toast"
 import PayrollGroupModal from "./PayrollGroupModal"
 import ConfirmModal from "../../ui/ConfirmModal"
+import Modal from "../../ui/Modal"
 
 const PayrollGroup = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
@@ -118,29 +119,29 @@ const PayrollGroup = () => {
 
   return (
     <>
-      {isAddPayrollModal && (
+      <Modal open={isAddPayrollModal}>
         <PayrollGroupModal
           onClose={() => setIsAddPayrollModal(false)}
           onPayrollSubmit={handleAddPayroll}
         />
-      )}
+      </Modal>
 
-      {isEditPayrollModal && (
+      <Modal open={isEditPayrollModal}>
         <PayrollGroupModal
           onClose={() => setIsEditPayrollModal(false)}
           onPayrollSubmit={handleEditPayroll}
           payroll={payrollToModify}
         />
-      )}
+      </Modal>
 
-      {isDeletePayrollModal && (
+      <Modal open={isDeletePayrollModal}>
         <ConfirmModal
           onClose={() => {
             setIsDeletePayrollModal(false)
           }}
           onConfirm={handleDeletePayroll}
         />
-      )}
+      </Modal>
 
       <div className="relative">
         <div className=" absolute right-4 -top-20">

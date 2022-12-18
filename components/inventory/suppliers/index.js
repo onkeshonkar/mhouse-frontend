@@ -10,24 +10,38 @@ import AddSupplierModal from "./AddSupplierModal"
 import useUserStore from "../../../stores/useUserStore"
 import Spinner from "../../ui/Spinner"
 import { fetcher } from "../../../lib/axios"
+import Modal from "../../ui/Modal"
 
 const Supplier = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
   const [isAddSupplier, setIsAddSupplier] = useState(false)
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/suppliers`,
+  const { data, error, isLoading, mutate } = useSWR(
+    user.type === "OWNER" || user.roles.access["SUPPLIER"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/suppliers`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
     }
   )
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch suppliers list"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch suppliers list"}</div>
+      )
     }
   }
 
@@ -42,12 +56,12 @@ const Supplier = () => {
 
   return (
     <>
-      {isAddSupplier && (
+      <Modal open={isAddSupplier} transparent={false}>
         <AddSupplierModal
           onClose={() => setIsAddSupplier(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
@@ -67,10 +81,13 @@ const Supplier = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddSupplier(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Supplier</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["SUPPLIER"].includes("add")) && (
+              <Button onClick={() => setIsAddSupplier(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Supplier</span>
+              </Button>
+            )}
           </div>
         </header>
 

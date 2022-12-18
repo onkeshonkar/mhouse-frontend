@@ -17,12 +17,14 @@ const RegisterNewCash = ({ onClose, mutate }) => {
 
   const [pin, setPin] = useState({ 0: "", 1: "", 2: "", 3: "" })
 
+  const [isLoading, setIsLoading] = useState(false)
   const [time, setTime] = useState(times[0])
   const currencyRef = useRef()
 
   const onSubmit = async () => {
+    setIsLoading(true)
     const data = { ...currencyRef.current.currency, time }
-    console.log(data)
+
     try {
       await APIService.post(
         `/v1/branches/${selectedBranch.id}/cash-register`,
@@ -37,57 +39,50 @@ const RegisterNewCash = ({ onClose, mutate }) => {
         toast.error(message)
       }
     }
+    setIsLoading(false)
     mutate()
     onClose()
   }
 
   return (
-    <Modal
-      open={true}
-      setOpen={() => {
-        onClose()
-      }}
-      transparent={false}
-    >
-      <div className="max-w-8xl min-h-screen flex flex-col relative ">
-        <button onClick={onClose} className="absolute right-0 mt-20">
-          <Close />
-        </button>
+    <div className="flex flex-col relative ">
+      <button onClick={onClose} className="absolute right-0 mt-20">
+        <Close />
+      </button>
 
-        <h2 className="text-4xl font-semibold my-20">Register New Cash</h2>
+      <h2 className="text-4xl font-semibold my-20">Register New Cash</h2>
 
-        <div className="flex flex-col items-center gap-20">
-          <RadioInput onChange={setTime} value={time} options={times} />
+      <div className="flex flex-col items-center gap-20">
+        <RadioInput onChange={setTime} value={time} options={times} />
 
-          <CurrencyCount ref={currencyRef} />
-        </div>
-
-        <div className="flex items-center justify-between mt-24 w-laptop">
-          <Button onClick={onClose} className="bg-primary" gradient={false}>
-            <Arrow
-              width={20}
-              height={20}
-              className="mr-6 rotate-180 group-hover:-translate-x-1 duration-300"
-            />
-            <span> Back</span>
-          </Button>
-
-          <div className="flex items-center gap-4">
-            <span>Enter Your PIN</span>
-            <OTPBox value={pin} handleValue={setPin} />
-          </div>
-
-          <Button onClick={onSubmit}>
-            <span>Submit</span>
-            <Arrow
-              width={20}
-              height={20}
-              className="ml-6 group-hover:translate-x-1 duration-300"
-            />
-          </Button>
-        </div>
+        <CurrencyCount ref={currencyRef} />
       </div>
-    </Modal>
+
+      <div className="flex items-center justify-between mt-24 w-laptop">
+        <Button onClick={onClose} className="bg-primary" gradient={false}>
+          <Arrow
+            width={20}
+            height={20}
+            className="mr-6 rotate-180 group-hover:-translate-x-1 duration-300"
+          />
+          <span> Back</span>
+        </Button>
+
+        <div className="flex items-center gap-4">
+          <span>Enter Your PIN</span>
+          <OTPBox value={pin} handleValue={setPin} />
+        </div>
+
+        <Button onClick={onSubmit} loading={isLoading}>
+          <span>Submit</span>
+          <Arrow
+            width={20}
+            height={20}
+            className="ml-6 group-hover:translate-x-1 duration-300"
+          />
+        </Button>
+      </div>
+    </div>
   )
 }
 

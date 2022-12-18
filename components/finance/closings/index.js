@@ -7,25 +7,37 @@ import useUserStore from "../../../stores/useUserStore"
 import { Draft, Filter, Paper, Plus } from "../../icons"
 import Avatar from "../../ui/Avatar"
 import Button from "../../ui/Button"
+import Modal from "../../ui/Modal"
 import Spinner from "../../ui/Spinner"
 import TooltipButton from "../../ui/ToolTipButton"
 import RegisterNewClosing from "./RegisterNewClosing"
 
 const Closing = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [isNewClosing, setIsNewClosing] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/closings`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["CLOSING_DAY"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/closings`
+      : null,
     fetcher
   )
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch closings"}</span>
+      return <div className="mt-10 text-center">{"Can't fetch closings"}</div>
     }
   }
 
@@ -36,20 +48,24 @@ const Closing = () => {
       </div>
     )
 
+  const totalClosing = data.closings.reduce((prev, curr) => {
+    return prev + curr.totalIncome
+  }, 0)
+
   return (
     <>
-      {isNewClosing && (
+      <Modal open={isNewClosing} transparent={false}>
         <RegisterNewClosing
           onClose={() => setIsNewClosing(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
           <div>
             <h1 className="text-2xl font-bold">Finance Management</h1>
-            <p className="text-sm font-light">1,687 Days Closed</p>
+            <p className="text-sm font-light">$ {totalClosing} Closed</p>
           </div>
 
           <div className="flex gap-6">
@@ -61,10 +77,13 @@ const Closing = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsNewClosing(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Closing</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["CLOSING_DAY"].includes("add")) && (
+              <Button onClick={() => setIsNewClosing(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Closing</span>
+              </Button>
+            )}
           </div>
         </header>
 

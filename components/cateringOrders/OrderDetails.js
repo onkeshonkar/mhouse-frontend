@@ -18,6 +18,7 @@ const OrderDetails = ({ handleSubmit, onBack }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const { orderDetails, setOrderDetails } = useContext(CateringOrderContext)
 
+  const [isLoading, setIsLoading] = useState(false)
   const [query, setQuery] = useState("")
   const [paymentMethod, setPaymentMethod] = useState(
     orderDetails.paymentMethod || paymentMethods[0]
@@ -86,7 +87,7 @@ const OrderDetails = ({ handleSubmit, onBack }) => {
     return acc + cartItem.sellPrice * cartItem.quantity
   }, 0)
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setOrderDetails({
       ...orderDetails,
       paymentMethod,
@@ -94,13 +95,18 @@ const OrderDetails = ({ handleSubmit, onBack }) => {
       notes,
       cart,
     })
-    handleSubmit({
+
+    setIsLoading(true)
+
+    await handleSubmit({
       ...orderDetails,
       paymentMethod,
       upfrontPayment,
       notes,
       cart,
     })
+
+    setIsLoading(false)
   }
 
   const addMenuToCart = (e) => {
@@ -353,7 +359,7 @@ const OrderDetails = ({ handleSubmit, onBack }) => {
           </svg>
         </span>
 
-        <Button onClick={onSubmit}>
+        <Button onClick={onSubmit} loading={isLoading}>
           <span>Next</span>
           <Arrow
             width={20}

@@ -29,6 +29,7 @@ const Instructions = ({ onNext, onBack }) => {
 
   const [orderVia, setOrderVia] = useState(supplier.orderVia || orderMethods[0])
   const [department, setDepartment] = useState(supplier.department || "")
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -45,8 +46,10 @@ const Instructions = ({ onNext, onBack }) => {
 
   const onSubmit = async (data) => {
     if (!department) return toast.error("Select Department")
+    setIsLoading(true)
     updateSupplier({ ...data, department, orderVia })
-    onNext()
+    await onNext()
+    setIsLoading(false)
   }
 
   return (
@@ -168,7 +171,7 @@ const Instructions = ({ onNext, onBack }) => {
           </svg>
         </span>
 
-        <Button onClick={handleSubmit(onSubmit)}>
+        <Button onClick={handleSubmit(onSubmit)} loading={isLoading}>
           <span>Next</span>
           <Arrow
             width={20}

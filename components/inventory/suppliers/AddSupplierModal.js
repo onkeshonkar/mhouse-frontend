@@ -5,7 +5,6 @@ import { APIService } from "../../../lib/axios"
 import useSupplierStore from "../../../stores/useSupplierStore"
 import useUserStore from "../../../stores/useUserStore"
 import { Close } from "../../icons"
-import Modal from "../../ui/Modal"
 import Instructions from "./Instructions"
 import SupplierInfo from "./SupplierInfo"
 
@@ -38,20 +37,18 @@ const AddSupplierModal = ({ onClose, mutate }) => {
   }
 
   return (
-    <Modal open={true} setOpen={() => {}} transparent={false}>
-      <div className="max-w-8xl min-h-screen flex flex-col relative ">
-        <button onClick={onClose} className="absolute right-0 mt-20">
-          <Close />
-        </button>
+    <div className=" flex flex-col relative ">
+      <button onClick={onClose} className="absolute right-0 mt-20">
+        <Close />
+      </button>
 
-        {currPage == 1 && (
-          <SupplierInfo onNext={() => setCurrPage(2)} onBack={onClose} />
-        )}
-        {currPage == 2 && (
-          <Instructions onNext={handleSubmit} onBack={() => setCurrPage(1)} />
-        )}
-      </div>
-    </Modal>
+      {currPage == 1 && (
+        <SupplierInfo onNext={() => setCurrPage(2)} onBack={onClose} />
+      )}
+      {currPage == 2 && (
+        <Instructions onNext={handleSubmit} onBack={() => setCurrPage(1)} />
+      )}
+    </div>
   )
 }
 

@@ -52,26 +52,24 @@ const AddCateringModal = ({ onClose, mutate }) => {
   }
 
   return (
-    <Modal open={true} setOpen={() => {}} transparent={false}>
-      <div className="max-w-8xl min-h-screen flex flex-col relative ">
-        <button onClick={onClose} className="absolute right-0 mt-20">
-          <Close />
-        </button>
+    <div className="flex flex-col relative">
+      <button onClick={onClose} className="absolute right-0 mt-20">
+        <Close />
+      </button>
 
-        <CateringOrderProvider>
-          {currPage === 1 && (
-            <ClientDetails onBack={onClose} onNext={() => setCurrPage(2)} />
-          )}
+      <CateringOrderProvider>
+        {currPage === 1 && (
+          <ClientDetails onBack={onClose} onNext={() => setCurrPage(2)} />
+        )}
 
-          {currPage === 2 && (
-            <OrderDetails
-              onBack={() => setCurrPage(1)}
-              handleSubmit={handleSubmit}
-            />
-          )}
-        </CateringOrderProvider>
-      </div>
-    </Modal>
+        {currPage === 2 && (
+          <OrderDetails
+            onBack={() => setCurrPage(1)}
+            handleSubmit={handleSubmit}
+          />
+        )}
+      </CateringOrderProvider>
+    </div>
   )
 }
 

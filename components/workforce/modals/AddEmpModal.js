@@ -4,7 +4,6 @@ import { APIService } from "../../../lib/axios"
 import useAddEmpStore from "../../../stores/useAddEmpStore"
 import useUserStore from "../../../stores/useUserStore"
 
-import Modal from "../../ui/Modal"
 import BasicInfo from "../BasicInfo"
 import EmergencyContact from "../EmergencyContact"
 import Experience from "../Experience"
@@ -107,7 +106,7 @@ const AddEmpModal = ({ onCancel }) => {
   }
 
   return (
-    <Modal open={true} setOpen={() => {}} transparent={false}>
+    <>
       {currentPage === 1 && (
         <BasicInfo
           onBack={onCancel}
@@ -163,7 +162,7 @@ const AddEmpModal = ({ onCancel }) => {
           onSubmit={onSubmit}
         />
       )}
-    </Modal>
+    </>
   )
 }
 

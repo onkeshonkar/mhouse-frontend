@@ -13,12 +13,16 @@ import { toast } from "react-hot-toast"
 
 const Supplier = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [selectedOrder, setSelectedOrder] = useState()
   const route = useRouter()
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/catering-orders`,
+  const { data, error, mutate, isLoading } = useSWR(
+    user.type === "OWNER" ||
+      user.roles.access["CATERING_ORDERS"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/catering-orders`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
@@ -29,11 +33,21 @@ const Supplier = () => {
     if (data) setSelectedOrder(data.cateringOrders[0])
   }, [data])
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch catering orders"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch catering orders"}</div>
+      )
     }
   }
 

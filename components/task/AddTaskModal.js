@@ -42,7 +42,7 @@ const AddTaskModal = ({ onCancel, mutate }) => {
   }
 
   return (
-    <Modal open={true} setOpen={() => {}} transparent={false}>
+    <>
       {currPage === 1 && (
         <TaskInfo onCancel={onCancel} onNext={() => setCurrPage(2)} />
       )}
@@ -54,7 +54,7 @@ const AddTaskModal = ({ onCancel, mutate }) => {
           onSubmit={onSubmit}
         />
       )}
-    </Modal>
+    </>
   )
 }
 

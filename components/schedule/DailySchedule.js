@@ -27,7 +27,7 @@ const timings = [
   "06:00",
 ]
 
-const DailySchedule = ({ date, setUnPublished }) => {
+const DailySchedule = ({ date }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const [query, setQuery] = useState("")
 
@@ -40,7 +40,9 @@ const DailySchedule = ({ date, setUnPublished }) => {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch employee list"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch employee list"}</div>
+      )
     }
   }
 
@@ -52,7 +54,6 @@ const DailySchedule = ({ date, setUnPublished }) => {
     )
 
   const emps = data.employees
-  setUnPublished(data.unPublishedSchedule)
 
   const filteredEmps =
     query === ""

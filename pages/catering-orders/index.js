@@ -8,6 +8,7 @@ import AddCateringModal from "../../components/cateringOrders/AddOrderModal"
 import { Filter, Plus, Report } from "../../components/icons/"
 import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
+import Modal from "../../components/ui/Modal"
 import Spinner from "../../components/ui/Spinner"
 import TooltipButton from "../../components/ui/ToolTipButton"
 import { fetcher } from "../../lib/axios"
@@ -16,20 +17,34 @@ import useUserStore from "../../stores/useUserStore"
 const CateringOrders = () => {
   const [isAddCatering, setIsAddCatering] = useState(false)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/catering-orders`,
+  const { data, error, isLoading, mutate } = useSWR(
+    user.type === "OWNER" ||
+      user.roles.access["CATERING_ORDERS"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/catering-orders`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
     }
   )
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch catering orders"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch catering orders"}</div>
+      )
     }
   }
 
@@ -49,12 +64,12 @@ const CateringOrders = () => {
 
   return (
     <>
-      {isAddCatering && (
+      <Modal open={isAddCatering} transparent={false}>
         <AddCateringModal
           onClose={() => setIsAddCatering(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
@@ -95,12 +110,15 @@ const CateringOrders = () => {
               <Filter />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddCatering(true)}>
-              <Plus width={12} height={12} />
-              <span className="text-base font-semibold ml-2">
-                New New Order
-              </span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["CATERING_ORDERS"].includes("add")) && (
+              <Button onClick={() => setIsAddCatering(true)}>
+                <Plus width={12} height={12} />
+                <span className="text-base font-semibold ml-2">
+                  New New Order
+                </span>
+              </Button>
+            )}
           </div>
         </div>
 

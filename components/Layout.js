@@ -58,6 +58,7 @@ const Layout = ({ children }) => {
     }
 
     if (error) {
+      console.log(error)
       if (error.code === "ERR_NETWORK" && router.pathname !== "/") {
         toast.error(error.message)
         router.replace("/")

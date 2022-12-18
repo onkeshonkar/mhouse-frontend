@@ -6,6 +6,7 @@ import useSWR from "swr"
 import { Filter, Plus, Report } from "../components/icons/"
 import AddMenuModal from "../components/menuEngineering/AddMenuModal"
 import Button from "../components/ui/Button"
+import Modal from "../components/ui/Modal"
 import Spinner from "../components/ui/Spinner"
 import TooltipButton from "../components/ui/ToolTipButton"
 import { fetcher } from "../lib/axios"
@@ -19,21 +20,33 @@ const menuStatus = ["Plowhorse", "Stars", "Puzzle", "Dog"]
 
 const MenuEngineering = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
+
   const [isAddNewMenu, setIsAddNewMenu] = useState(false)
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/menu`,
+  const { data, error, isLoading, mutate } = useSWR(
+    user.type === "OWNER" || user.roles.access["MENU"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/menu`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
     }
   )
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch menu list"}</span>
+      return <div className="mt-10 text-center">{"Can't fetch menu list"}</div>
     }
   }
 
@@ -46,14 +59,14 @@ const MenuEngineering = () => {
 
   const { menu } = data
   const totalItemSold = menu.reduce((prevVal, currVal) => {
-    return prevVal + currVal.sellCount
+    return prevVal + (currVal.sellCount || 0)
   }, 0)
 
   return (
     <>
-      {isAddNewMenu && (
+      <Modal open={isAddNewMenu} transparent={false}>
         <AddMenuModal onClose={() => setIsAddNewMenu(false)} mutate={mutate} />
-      )}
+      </Modal>
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
@@ -71,10 +84,13 @@ const MenuEngineering = () => {
               <Filter />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddNewMenu(true)}>
-              <Plus width={12} height={12} />
-              <span className="text-base font-semibold ml-2">New Item</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["MENU"].includes("add")) && (
+              <Button onClick={() => setIsAddNewMenu(true)}>
+                <Plus width={12} height={12} />
+                <span className="text-base font-semibold ml-2">New Item</span>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -163,7 +179,7 @@ const MenuEngineering = () => {
                   <td className="text-sm text-primary font-bold text-center px-4 py-2">
                     {menuItem.sellCount}{" "}
                     <span className="opacity-50">
-                      ({(menuItem.sellCount * 100) / totalItemSold} %)
+                      ({(menuItem.sellCount * 100) / totalItemSold || 0} %)
                     </span>
                   </td>
 

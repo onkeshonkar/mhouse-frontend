@@ -5,12 +5,14 @@ import useUserStore from "../../stores/useUserStore"
 
 import { Plus, Clock, Check } from "../icons"
 import Button from "../ui/Button"
+import Modal from "../ui/Modal"
 import RadioInput from "../ui/RadioInput"
 
 const leaveTypes = ["Annual Leave", "Unpaid Leave", "Sick Leave"]
 
 const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [breakTime, setBreakTime] = useState("0")
   const [startTime, setStartTime] = useState(workSlot[0])
@@ -78,21 +80,28 @@ const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
       </div>
     )
 
+  const haveAddAccess =
+    user.type === "OWNER" || user.roles.access["SCHEDULE_SHIFT"].includes("add")
+
   return (
     <>
       {!openAddwokModal && (
         <div
-          onClick={() => setOpenworkmodal(true)}
-          role="button"
-          className="bg-x-green h-9 w-9 rounded-lg flex items-center justify-center hover:bg-accent transition-all duration-150 shadow-lg"
+          {...(haveAddAccess && {
+            onClick: () => setOpenworkmodal(true),
+            role: "button",
+          })}
+          className={`${
+            haveAddAccess ? "bg-x-green hover:bg-accent" : "bg-gray-400"
+          } h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-150 shadow-lg`}
         >
           <Plus width={16} height={16} className="text-white" />
         </div>
       )}
 
-      {openAddwokModal && (
+      <Modal open={openAddwokModal}>
         <div
-          className="bg-white z-20 p-6 absolute rounded-xl shadow-xl w-[480px] h-[360px]"
+          className="bg-white z-20 p-6 d rounded-xl shadow-xl w-[480px]"
           ref={divRef}
         >
           <span className="text-xs mb-1 flex justify-center">
@@ -144,11 +153,11 @@ const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
                 <span className="text-sm mr-4">Break Time</span>
 
                 <input
-                  type="number"
+                  type="Number"
                   className="block h-8 w-16 text-center border-none rounded-2xl bg-background disabled:opacity-30"
                   value={breakTime}
                   disabled={mode === "leave" ? true : false}
-                  onChange={(e) => setBreakTime(e.target.value)}
+                  onChange={(e) => setBreakTime(e.target.valueAsNumber || 0)}
                 />
 
                 <span className="ml-2 text-lg">min</span>
@@ -178,7 +187,7 @@ const AddSchedule = ({ workSlot, date, employeeId, reloadSchedule }) => {
             </Button>
           </div>
         </div>
-      )}
+      </Modal>
     </>
   )
 }

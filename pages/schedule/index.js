@@ -6,8 +6,11 @@ import DailySchedule from "../../components/schedule/DailySchedule"
 import WeeklySchedule from "../../components/schedule/WeeklySchedule"
 import Calender from "../../components/ui/Calender"
 import TooltipButton from "../../components/ui/ToolTipButton"
+import useUserStore from "../../stores/useUserStore"
 
 const Schedule = () => {
+  const user = useUserStore((store) => store.user)
+
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"))
   const [showCalender, setShowCalender] = useState(false)
 
@@ -18,6 +21,17 @@ const Schedule = () => {
   const [unPublished, setUnPublished] = useState(true)
 
   const [showToday, setShowToday] = useState(false)
+
+  if (
+    user.type !== "OWNER" &&
+    !user.roles.access["SCHEDULE_SHIFT"].includes("view")
+  ) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   return (
     <div className="mt-8 ml-6">

@@ -8,6 +8,7 @@ import { Draft, Filter, Plus, Report } from "../../components/icons/"
 import AddTaskModal from "../../components/task/AddTaskModal"
 import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
+import Modal from "../../components/ui/Modal"
 import Spinner from "../../components/ui/Spinner"
 import TooltipButton from "../../components/ui/ToolTipButton"
 import { fetcher } from "../../lib/axios"
@@ -16,17 +17,31 @@ import useUserStore from "../../stores/useUserStore"
 const Tasks = () => {
   const [isAddTask, setIsAddTask] = useState(false)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/tasks`,
-    fetcher
+  const { data, error, isLoading, mutate } = useSWR(
+    user.type === "OWNER" || user.roles.access["TASKS"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/tasks`
+      : null,
+    fetcher,
+    { errorRetryCount: 2 }
   )
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch employee list"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch employee list"}</div>
+      )
     }
   }
 
@@ -46,9 +61,9 @@ const Tasks = () => {
 
   return (
     <>
-      {isAddTask && (
+      <Modal open={isAddTask} transparent={false}>
         <AddTaskModal onCancel={() => setIsAddTask(false)} mutate={mutate} />
-      )}
+      </Modal>
 
       <div className="mt-8 ml-6">
         <div className="flex item center justify-between">
@@ -87,10 +102,13 @@ const Tasks = () => {
               <Filter />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddTask(true)}>
-              <Plus width={12} height={12} />
-              <span className="text-base font-semibold ml-2">New Task</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["TASKS"].includes("add")) && (
+              <Button onClick={() => setIsAddTask(true)}>
+                <Plus width={12} height={12} />
+                <span className="text-base font-semibold ml-2">New Task</span>
+              </Button>
+            )}
           </div>
         </div>
 

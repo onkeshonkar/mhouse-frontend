@@ -39,26 +39,24 @@ const AddMenuModal = ({ onClose, mutate }) => {
   }
 
   return (
-    <Modal open={true} setOpen={() => {}} transparent={false}>
-      <div className="max-w-8xl min-h-screen flex flex-col relative ">
-        <button onClick={onClose} className="absolute right-0 mt-20">
-          <Close />
-        </button>
+    <div className="flex flex-col relative ">
+      <button onClick={onClose} className="absolute right-0 mt-20">
+        <Close />
+      </button>
 
-        <MenuEngProvider>
-          {currPage === 1 && (
-            <BasicDetails onBack={onClose} onNext={() => setCurrPage(2)} />
-          )}
+      <MenuEngProvider>
+        {currPage === 1 && (
+          <BasicDetails onBack={onClose} onNext={() => setCurrPage(2)} />
+        )}
 
-          {currPage === 2 && (
-            <AddRawMaterial
-              onBack={() => setCurrPage(1)}
-              handleSubmit={handleSubmit}
-            />
-          )}
-        </MenuEngProvider>
-      </div>
-    </Modal>
+        {currPage === 2 && (
+          <AddRawMaterial
+            onBack={() => setCurrPage(1)}
+            handleSubmit={handleSubmit}
+          />
+        )}
+      </MenuEngProvider>
+    </div>
   )
 }
 

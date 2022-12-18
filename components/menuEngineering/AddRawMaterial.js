@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react"
+import { toast } from "react-hot-toast"
 import useSWR from "swr"
 
 import { menuEngContext } from "../../context/MenuEngContext"
@@ -14,6 +15,7 @@ const AddRawMaterial = ({ handleSubmit, onBack }) => {
 
   const { menuDetails, setMenuDetails } = useContext(menuEngContext)
   const [query, setQuery] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const [cart, setCart] = useState(menuDetails.cart || [])
 
   const { data, error, mutate } = useSWR(
@@ -53,8 +55,15 @@ const AddRawMaterial = ({ handleSubmit, onBack }) => {
       ...menuDetails,
       cart,
     })
+    setIsLoading(true)
 
-    handleSubmit({ ...menuDetails, rawItems: cart })
+    if (!cart.length) {
+      setIsLoading(false)
+      return toast.error("Select raw items")
+    }
+
+    await handleSubmit({ ...menuDetails, rawItems: cart })
+    setIsLoading(false)
   }
 
   const cartAmount = cart.reduce((acc, cartItem) => {
@@ -245,7 +254,7 @@ const AddRawMaterial = ({ handleSubmit, onBack }) => {
           </svg>
         </span>
 
-        <Button onClick={onSubmit}>
+        <Button onClick={onSubmit} loading={isLoading}>
           <span>Next</span>
           <Arrow
             width={20}

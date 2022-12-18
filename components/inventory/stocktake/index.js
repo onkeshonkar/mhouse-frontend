@@ -8,61 +8,33 @@ import TooltipButton from "../../ui/ToolTipButton"
 import AddStocktakeModal from "./AddStocktakeModal"
 import { fetcher } from "../../../lib/axios"
 import Spinner from "../../ui/Spinner"
-
-const stockTakes = [
-  {
-    id: 12,
-    item: "Tomato",
-    unit: "kg",
-    begin: "7.00 kg",
-    purchased: "8.00 kg",
-    minStock: "10.00 kg",
-    sold: "3.00 kg",
-    waste: "1.50 kg",
-    stock: "6.00 kg",
-    inStock: "180 kg",
-  },
-  {
-    id: 123,
-    item: "Burger",
-    unit: "L",
-    begin: "9.00 kg",
-    purchased: "8.00 kg",
-    minStock: "10.00 kg",
-    sold: "3.00 kg",
-    waste: "1.50 kg",
-    stock: "6.00 kg",
-    inStock: "150 kg",
-  },
-  {
-    id: 1234,
-    item: "Meat",
-    unit: "kg",
-    begin: "7.00 kg",
-    purchased: "8.00 kg",
-    minStock: "10.00 kg",
-    sold: "3.00 kg",
-    waste: "1.50 kg",
-    stock: "6.00 kg",
-    inStock: "110 kg",
-  },
-]
+import Modal from "../../ui/Modal"
 
 const Stocktake = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
   const [isAddStocktake, setIsAddStocktake] = useState(false)
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/stocktakes`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["STOCKTAKE"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/stocktakes`
+      : null,
     fetcher
   )
+
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
 
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      // toast.error(JSON.stringify(error))
-      return <span>{"Can't fetch stocktakes"}</span>
+      return <div className="mt-10 text-center">{"Can't fetch stocktakes"}</div>
     }
   }
 
@@ -77,12 +49,12 @@ const Stocktake = () => {
 
   return (
     <>
-      {isAddStocktake && (
+      <Modal open={isAddStocktake}>
         <AddStocktakeModal
           onClose={() => setIsAddStocktake(false)}
           mutate={mutate}
         />
-      )}
+      </Modal>
 
       <main>
         <header className="flex justify-between items-center px-4 -mt-10">
@@ -102,10 +74,13 @@ const Stocktake = () => {
               <Paper className="text-x-grey" />
             </TooltipButton>
 
-            <Button onClick={() => setIsAddStocktake(true)}>
-              <Plus width={16} height={16} className="mr-2" />
-              <span>New Item</span>
-            </Button>
+            {(user.type === "OWNER" ||
+              user.roles.access["STOCKTAKE"].includes("add")) && (
+              <Button onClick={() => setIsAddStocktake(true)}>
+                <Plus width={16} height={16} className="mr-2" />
+                <span>New Item</span>
+              </Button>
+            )}
           </div>
         </header>
 

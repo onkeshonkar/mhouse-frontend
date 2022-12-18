@@ -20,9 +20,11 @@ import {
 import TooltipButton from "../../../components/ui/ToolTipButton"
 import AddCartModal from "../../../components/inventory/suppliers/AddCartModal"
 import { toast } from "react-hot-toast"
+import Modal from "../../../components/ui/Modal"
 
 const Supplier = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
   const [isAddCartModal, setIsAddCartModal] = useState(false)
 
   const [selectedOrder, setSelectedOrder] = useState()
@@ -68,8 +70,10 @@ const Supplier = () => {
     mutate()
   }
 
-  const { data, error, mutate } = useSWR(
-    `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}`,
+  const { data, error, isLoading, mutate } = useSWR(
+    user.type === "OWNER" || user.roles.access["SUPPLIER"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
@@ -81,7 +85,9 @@ const Supplier = () => {
     error: orderError,
     mutate: mutateOrder,
   } = useSWR(
-    `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}/orders`,
+    user.type === "OWNER" || user.roles.access["SUPPLIER"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/suppliers/${supplierId}/orders`
+      : null,
     fetcher,
     {
       errorRetryCount: 2,
@@ -110,6 +116,14 @@ const Supplier = () => {
     if (ordersData) setSelectedOrder(ordersData.orders[0])
   }, [ordersData])
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error("Network Error")
@@ -131,13 +145,13 @@ const Supplier = () => {
 
   return (
     <>
-      {isAddCartModal && (
+      <Modal open={isAddCartModal} transparent={false}>
         <AddCartModal
           onClose={() => setIsAddCartModal(false)}
           mutateOrder={mutateOrder}
           supplier={supplierId}
         />
-      )}
+      </Modal>
 
       <div className="mt-8 ml-6">
         <div className="flex gap-4">
@@ -169,10 +183,14 @@ const Supplier = () => {
                   >
                     <Delete className="text-white" />
                   </TooltipButton>
-                  <Button onClick={() => setIsAddCartModal(true)}>
-                    <Plus width={20} height={20} className="mr-2" />
-                    <span>New Cart</span>
-                  </Button>
+
+                  {(user.type === "OWNER" ||
+                    user.roles.access["BUILD_CART"].includes("add")) && (
+                    <Button onClick={() => setIsAddCartModal(true)}>
+                      <Plus width={20} height={20} className="mr-2" />
+                      <span>New Cart</span>
+                    </Button>
+                  )}
                 </div>
               </div>
 

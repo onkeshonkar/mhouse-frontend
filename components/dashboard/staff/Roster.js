@@ -33,14 +33,6 @@ const Roster = () => {
       return <span>{"Can't fetch your schedule"}</span>
     }
   }
-  console.log(data)
-
-  // if (!data)
-  //   return (
-  //     <div className="mt-10 text-center">
-  //       <Spinner />
-  //     </div>
-  //   )
 
   const schedules = data?.schedules
 

@@ -12,16 +12,20 @@ import Avatar from "../../components/ui/Avatar"
 import Button from "../../components/ui/Button"
 import AddEmpModal from "../../components/workforce/modals/AddEmpModal"
 import EditEmpModal from "../../components/workforce/modals/EditEmpModal"
+import Modal from "../../components/ui/Modal"
 
 const Workforce = () => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [isAddEmpModal, setIsAddEmpModal] = useState(false)
   const [isEditEmpModal, setIsEditEmpModal] = useState(false)
   const [empToModify, setEmpToModify] = useState()
 
-  const { data, error, mutate } = useSWRImmutable(
-    `/v1/branches/${selectedBranch.id}/employees`,
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    user.type === "OWNER" || user.roles.access["WORKFORCE"].includes("view")
+      ? `/v1/branches/${selectedBranch.id}/employees`
+      : null,
     fetcher
   )
 
@@ -32,11 +36,21 @@ const Workforce = () => {
     setIsEditEmpModal(true)
   }
 
+  if (!isLoading && !data && !error) {
+    return (
+      <div className="mt-10 text-center">
+        You don&apos;t have enough permission.
+      </div>
+    )
+  }
+
   if (error) {
     if (error.code === "ERR_NETWORK") {
       toast.error(error.message)
     } else {
-      return <span>{"Can't fetch employee list"}</span>
+      return (
+        <div className="mt-10 text-center">{"Can't fetch employee list"}</div>
+      )
     }
   }
 
@@ -47,21 +61,21 @@ const Workforce = () => {
       </div>
     )
   const { employees } = data
-  const todaysEmploye = employees.length
+  const todaysEmploye = 0
   const nowEmploye = 0
 
   return (
     <>
-      {isAddEmpModal && (
+      <Modal open={isAddEmpModal} transparent={false}>
         <AddEmpModal
           onCancel={() => {
             setIsAddEmpModal(false)
             mutate()
           }}
         />
-      )}
+      </Modal>
 
-      {isEditEmpModal && (
+      <Modal open={isEditEmpModal} transparent={false}>
         <EditEmpModal
           onCancel={() => {
             setIsEditEmpModal(false)
@@ -69,7 +83,7 @@ const Workforce = () => {
           }}
           emp={empToModify}
         />
-      )}
+      </Modal>
 
       <div className="mt-8 ml-6">
         <main>
@@ -129,10 +143,13 @@ const Workforce = () => {
                 <Filter className="text-x-grey" />
               </TooltipButton>
 
-              <Button onClick={() => setIsAddEmpModal(true)}>
-                <Plus width={20} height={20} className="mr-2" />
-                <span>New Employee</span>
-              </Button>
+              {(user.type === "OWNER" ||
+                user.roles.access["WORKFORCE"].includes("add")) && (
+                <Button onClick={() => setIsAddEmpModal(true)}>
+                  <Plus width={20} height={20} className="mr-2" />
+                  <span>New Employee</span>
+                </Button>
+              )}
             </div>
           </header>
 

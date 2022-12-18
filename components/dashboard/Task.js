@@ -42,7 +42,7 @@ const Task = ({ task }) => {
     >
       <div className="flex justify-between items-center">
         <div>
-          <span>{task.title}</span>
+          <span className={classNames()}>{task.title}</span>
           <span className="block text-xs opacity-70">{task.department}</span>
         </div>
 
@@ -73,7 +73,7 @@ const Task = ({ task }) => {
             let isExpired
             if (item.dueTime) {
               isExpired = dayjs(
-                dayjs().format("YYYY/MM/DD").toString() + ` ${"17:50"}`
+                dayjs().format("YYYY/MM/DD").toString() + ` ${item.dueTime}`
               ).isBefore(dayjs())
             }
             return (
