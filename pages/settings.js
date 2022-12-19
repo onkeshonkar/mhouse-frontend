@@ -15,7 +15,7 @@ function classNames(...classes) {
 
 const tabs = [
   { name: "Account", panel: Account },
-  { name: "Notifications", panel: Notification },
+  { name: "Notifications", panel: Notification, adminAcces: true },
   { name: "My Team", panel: MyTeam, adminAcces: true },
   { name: "My Branches", panel: MyBranch, adminAcces: true },
   { name: "Payroll", panel: PayrollGroup, adminAcces: true },

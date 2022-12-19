@@ -19,9 +19,7 @@ const Account = () => {
       <Restaurent />
 
       {(user.type === "OWNER" || user.type === "MANAGER") && <TimeCurrency />}
-      {user.type === "OWNER" && selectedBranch.isMainBranch && (
-        <DeleteProfile />
-      )}
+      {user.type == "OWNER" && selectedBranch.isMainBranch && <DeleteProfile />}
     </div>
   )
 }

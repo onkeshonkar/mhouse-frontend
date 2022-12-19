@@ -12,6 +12,7 @@ import Input from "./Input"
 
 const RoleList = ({ value, onChange }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [loading, setLoading] = useState(false)
   const [showAddBox, setShowAddBox] = useState(false)
@@ -143,44 +144,46 @@ const RoleList = ({ value, onChange }) => {
                 ))}
               </ul>
 
-              <div className="w-full flex flex-col gap-4 justify-center py-4 px-2.5 bg-gray-100 transition-all duration-300 ">
-                {showAddBox ? (
-                  <>
-                    <Input
-                      type="text"
-                      label="Role Name"
-                      value={newRole}
-                      onChange={(e) => setNewRole(e.target.value)}
-                      className="w-11/12 mx-auto"
-                    />
+              {["OWNER", "MANAGER"].includes(user.type) && (
+                <div className="w-full flex flex-col gap-4 justify-center py-4 px-2.5 bg-gray-100 transition-all duration-300 ">
+                  {showAddBox ? (
+                    <>
+                      <Input
+                        type="text"
+                        label="Role Name"
+                        value={newRole}
+                        onChange={(e) => setNewRole(e.target.value)}
+                        className="w-11/12 mx-auto"
+                      />
 
-                    <div className=" flex gap-2 justify-between px-6">
-                      <button
-                        onClick={() => setShowAddBox(false)}
-                        className="bg-x-red text-white text-base px-6 py-3 font-semibold rounded-xl"
-                      >
-                        Cancel
-                      </button>
+                      <div className=" flex gap-2 justify-between px-6">
+                        <button
+                          onClick={() => setShowAddBox(false)}
+                          className="bg-x-red text-white text-base px-6 py-3 font-semibold rounded-xl"
+                        >
+                          Cancel
+                        </button>
 
-                      <Button
-                        loading={loading}
-                        onClick={() => {
-                          handleAddDeptmnt(newRole)
-                          setNewRole("")
-                          setShowAddBox(false)
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <Button onClick={() => setShowAddBox(true)}>
-                    <Plus width={12} height={12} />
-                    <span className="ml-2">Add Role</span>
-                  </Button>
-                )}
-              </div>
+                        <Button
+                          loading={loading}
+                          onClick={() => {
+                            handleAddDeptmnt(newRole)
+                            setNewRole("")
+                            setShowAddBox(false)
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <Button onClick={() => setShowAddBox(true)}>
+                      <Plus width={12} height={12} />
+                      <span className="ml-2">Add Role</span>
+                    </Button>
+                  )}
+                </div>
+              )}
             </Combobox.Options>
           </>
         )}

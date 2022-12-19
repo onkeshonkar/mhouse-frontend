@@ -90,7 +90,7 @@ const Restaurent = () => {
         </form>
       )}
 
-      {(!user.type || user.type === "MANAGER") && (
+      {user.type !== "OWNER" && (
         <>
           <div className="bg-background text-primary rounded-2xl h-[50px] relative flex items-center min-w-[312px]">
             <div className="w-full text-sm px-6 pt-3">

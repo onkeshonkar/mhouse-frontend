@@ -12,6 +12,7 @@ import Input from "./Input"
 
 const DepartmentList = ({ value, onChange }) => {
   const selectedBranch = useUserStore((store) => store.selectedBranch)
+  const user = useUserStore((store) => store.user)
 
   const [loading, setLoading] = useState(false)
   const [showAddBox, setShowAddBox] = useState(false)
@@ -127,58 +128,62 @@ const DepartmentList = ({ value, onChange }) => {
                         )}
                         {depmnt}
 
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteDeptmnt(depmnt)
-                          }}
-                          className="absolute right-4 text-[#FC5A5A] hover:bg-[#FC5A5A] hover:text-white transition-all p-2.5 rounded-full"
-                        >
-                          <Delete width={20} height={20} />
-                        </span>
+                        {["OWNER", "MANAGER"].includes(user.type) && (
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteDeptmnt(depmnt)
+                            }}
+                            className="absolute right-4 text-[#FC5A5A] hover:bg-[#FC5A5A] hover:text-white transition-all p-2.5 rounded-full"
+                          >
+                            <Delete width={20} height={20} />
+                          </span>
+                        )}
                       </li>
                     )}
                   </Combobox.Option>
                 ))}
               </ul>
 
-              <div className="w-full flex flex-col gap-4 justify-center py-4 px-2.5 bg-gray-100 transition-all duration-300 ">
-                {showAddBox ? (
-                  <>
-                    <Input
-                      type="text"
-                      label="Department Name"
-                      value={newDptmnt}
-                      onChange={(e) => setNewDpmnt(e.target.value)}
-                      className="w-11/12 mx-auto"
-                    />
-                    <div className=" flex gap-2 justify-between px-6">
-                      <button
-                        onClick={() => setShowAddBox(false)}
-                        className="bg-x-red text-white text-base px-6 py-3 font-semibold rounded-xl"
-                      >
-                        Cancel
-                      </button>
+              {["OWNER", "MANAGER"].includes(user.type) && (
+                <div className="w-full flex flex-col gap-4 justify-center py-4 px-2.5 bg-gray-100 transition-all duration-300 ">
+                  {showAddBox ? (
+                    <>
+                      <Input
+                        type="text"
+                        label="Department Name"
+                        value={newDptmnt}
+                        onChange={(e) => setNewDpmnt(e.target.value)}
+                        className="w-11/12 mx-auto"
+                      />
+                      <div className=" flex gap-2 justify-between px-6">
+                        <button
+                          onClick={() => setShowAddBox(false)}
+                          className="bg-x-red text-white text-base px-6 py-3 font-semibold rounded-xl"
+                        >
+                          Cancel
+                        </button>
 
-                      <Button
-                        loading={loading}
-                        onClick={() => {
-                          handleAddDeptmnt(newDptmnt)
-                          setNewDpmnt("")
-                          setShowAddBox(false)
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <Button onClick={() => setShowAddBox(true)}>
-                    <Plus width={12} height={12} />
-                    <span className="ml-2">Add Department</span>
-                  </Button>
-                )}
-              </div>
+                        <Button
+                          loading={loading}
+                          onClick={() => {
+                            handleAddDeptmnt(newDptmnt)
+                            setNewDpmnt("")
+                            setShowAddBox(false)
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <Button onClick={() => setShowAddBox(true)}>
+                      <Plus width={12} height={12} />
+                      <span className="ml-2">Add Department</span>
+                    </Button>
+                  )}
+                </div>
+              )}
             </Combobox.Options>
           </>
         )}

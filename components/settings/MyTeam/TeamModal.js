@@ -6,7 +6,6 @@ import toast from "react-hot-toast"
 
 import { Arrow, Close } from "../../icons"
 import Input from "../../ui/Input"
-import Modal from "../../ui/Modal"
 import Button from "../../ui/Button"
 import DepartmentList from "../../ui/DepartmentList"
 import RoleList from "../../ui/RoleList"
@@ -48,7 +47,6 @@ const TeamModal = ({ onClose, onSubmitTeam, emp }) => {
     setLoading(false)
   }
   return (
-    // <Modal open={true} setOpen={() => {}} transparent={false}>
     <div className="max-w-8xl min-h-screen flex flex-col gap-11 relative">
       <button onClick={onClose} className="absolute right-0 mt-20">
         <Close />
@@ -114,7 +112,6 @@ const TeamModal = ({ onClose, onSubmitTeam, emp }) => {
         </Button>
       </div>
     </div>
-    // </Modal>
   )
 }
 
