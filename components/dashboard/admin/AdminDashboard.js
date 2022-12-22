@@ -157,7 +157,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="flex gap-4 mt-4">
-        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">
+        <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full overflow-y-auto">
           <TodaysTask />
         </div>
         <div className="bg-white rounded-2xl px-7 py-6 max-h-80 h-80 w-full">

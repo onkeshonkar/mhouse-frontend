@@ -1,10 +1,14 @@
+import { useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
+
 import useUserStore from "../stores/useUserStore"
+import useNotificationStore from "../stores/useNotificartionStore"
 
 import { Bell, Logout, News, Settings, Search } from "./icons"
 import Avatar from "./ui/Avatar"
 import BranchList from "./ui/BranchList"
+import useSocket from "../hooks/useSocket"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -18,11 +22,41 @@ const navMenu = [
 
 const Header = () => {
   const user = useUserStore((store) => store.user)
+
+  const updateNotifications = useNotificationStore(
+    (store) => store.updateNotifications
+  )
+
+  const initNotifications = useNotificationStore(
+    (store) => store.initNotifications
+  )
+  const notifications = useNotificationStore((store) => store.notifications)
   const logOut = useUserStore((store) => store.logOut)
   const selectedBranch = useUserStore((store) => store.selectedBranch)
   const setSelectedBranch = useUserStore((store) => store.setSelectedBranch)
 
   const route = useRouter()
+  const socket = useSocket()
+
+  const unReadCount = useMemo(
+    () =>
+      notifications.reduce((prev, curr) => {
+        return prev + !curr.isRead
+      }, 0),
+    [notifications]
+  )
+
+  useEffect(() => {
+    socket.on("notification", (arg) => {
+      updateNotifications(arg)
+    })
+
+    socket.once("old notifications", (arg) => {
+      initNotifications(arg)
+    })
+
+    return () => socket.off("notification")
+  }, [])
 
   const handleCheckout = () => {}
 
@@ -98,6 +132,12 @@ const Header = () => {
                   <navItem.icon />
                   {navItem.href === route.pathname && (
                     <span className="absolute bottom-0 block w-full h-1 rounded-lg bg-accent" />
+                  )}
+
+                  {navItem.href === "/notifications" && unReadCount > 0 && (
+                    <span className="absolute flex items-center justify-center text-xs text-white bg-accent p-0.5 h-5 w-5 rounded-full right-1 top-5">
+                      {unReadCount}
+                    </span>
                   )}
                 </div>
               </a>
