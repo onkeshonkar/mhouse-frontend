@@ -3,7 +3,7 @@ import { io } from "socket.io-client"
 
 import useUserStore from "../stores/useUserStore"
 
-const URL = "http://localhost:4000"
+const URL = process.env.NEXT_PUBLIC_BACKEND
 
 const socket = io(URL, { autoConnect: false })
 

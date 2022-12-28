@@ -81,7 +81,7 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="text-sm">
+        {/* <div className="text-sm">
           <button
             onClick={handleCheckout}
             className="text-white bg-[#FC5A5A] rounded-xl px-5 py-2.5"
@@ -89,7 +89,7 @@ const Header = () => {
             Check-Out
           </button>
           <span className="ml-3">{"5 hr 57m"}</span>
-        </div>
+        </div> */}
 
         <div>
           <form onSubmit={handleSearch}>
