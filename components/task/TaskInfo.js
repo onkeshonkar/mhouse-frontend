@@ -11,7 +11,7 @@ import AddChecklistItem from "./AddChecklistItem"
 import { useTaskAddStore } from "../../stores/useAddTaskStore"
 
 const schema = z.object({
-  title: z.string().min(5, { message: "Must be at least 5 char" }).max(30),
+  title: z.string().min(5, { message: "Must be at least 5 char" }).max(100),
   comment: z.string(),
 })
 

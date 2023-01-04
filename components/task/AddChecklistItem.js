@@ -7,7 +7,7 @@ import { Delete, Plus } from "../icons"
 import { randomBytes } from "crypto"
 
 const schema = z.object({
-  subTask: z.string().min(5, { message: "Must be at least 5 char" }).max(30),
+  subTask: z.string().min(5, { message: "Must be at least 5 char" }).max(100),
   dueTime: z.string(),
 })
 

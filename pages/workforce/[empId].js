@@ -23,6 +23,7 @@ import SickCertificates from "../../components/workforce/BottomTabs/SickCertific
 import Resume from "../../components/workforce/BottomTabs/Resume"
 import Contact from "../../components/workforce/BottomTabs/Contact"
 import EmployeeList from "../../components/workforce/EmployeeList"
+import Avatar from "../../components/ui/Avatar"
 
 const tabs = [
   { name: "Timesheet", panel: TimeSheet },
@@ -88,13 +89,11 @@ const Employee = () => {
           <main>
             <div className="w-[1015px]">
               <section className="flex gap-6 bg-white rounded-2xl px-6 py-7 mb-8">
-                <div className="w-36 h-36 rounded-xl shadow-2xl">
-                  <Image
-                    src={employee.user.avatar}
-                    alt="profile pic"
+                <div className="w-36 h-36 rounded-xl shadow-2xl bg-blue-400 flex items-center justify-center">
+                  <Avatar
+                    user={employee.user}
                     width={144}
                     height={144}
-                    objectFit="cover"
                     className="rounded-xl"
                   />
                 </div>

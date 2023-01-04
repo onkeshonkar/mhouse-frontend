@@ -179,7 +179,11 @@ const MenuEngineering = () => {
                   <td className="text-sm text-primary font-bold text-center px-4 py-2">
                     {menuItem.sellCount}{" "}
                     <span className="opacity-50">
-                      ({(menuItem.sellCount * 100) / totalItemSold || 0} %)
+                      (
+                      {Number.parseFloat(
+                        (menuItem.sellCount * 100) / totalItemSold || 0
+                      ).toFixed(2)}
+                      %)
                     </span>
                   </td>
 

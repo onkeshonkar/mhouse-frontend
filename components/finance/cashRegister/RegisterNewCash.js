@@ -46,11 +46,11 @@ const RegisterNewCash = ({ onClose, mutate }) => {
 
   return (
     <div className="flex flex-col relative ">
-      <button onClick={onClose} className="absolute right-0 mt-20">
+      <button onClick={onClose} className="absolute right-0 mt-10">
         <Close />
       </button>
 
-      <h2 className="text-4xl font-semibold my-20">Register New Cash</h2>
+      <h2 className="text-4xl font-semibold my-10">Register New Cash</h2>
 
       <div className="flex flex-col items-center gap-20">
         <RadioInput onChange={setTime} value={time} options={times} />

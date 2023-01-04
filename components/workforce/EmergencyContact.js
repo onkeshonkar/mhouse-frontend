@@ -11,8 +11,8 @@ import Button from "../ui/Button"
 const schema = z.object({
   fullName: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
   relation: z.string().min(3, { message: "Must be at least 3 char" }).max(15),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Must be 10 digits with country code +61",
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Must be 10 digits with country code +91",
   }),
 })
 
@@ -59,7 +59,7 @@ const EmergencyContact = ({ onBack, onNext, onCancel }) => {
           label="Phone Number"
           autoComplete="phoneNumber"
           className="w-[350px]"
-          defaultValue={emp.emergencyContact?.phoneNumber || "+61"}
+          defaultValue={emp.emergencyContact?.phoneNumber || "+91"}
           {...register("phoneNumber")}
           error={errors.phoneNumber}
         />

@@ -14,12 +14,12 @@ const schema = z.object({
     .string()
     .min(3, { message: "Name should be at least 3 char" })
     .max(50),
-  rPhoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Phone No.should be 10 digits with country code +61",
+  rPhoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Phone No.should be 10 digits with country code +91",
   }),
   relation: z.string().min(3),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Phone No.should be 10 digits with country code +61",
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Phone No.should be 10 digits with country code +91",
   }),
   fullAddress: z
     .string()

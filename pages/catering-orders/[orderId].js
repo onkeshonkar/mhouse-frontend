@@ -180,7 +180,7 @@ const Supplier = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 flex-grow max-h-[85vh] overflow-y-auto p-2">
+        <div className="flex flex-col gap-4 flex-grow max-h-[85vh] overflow-y-auto p-2 relative z-50">
           {cateringOrders.map((history) => (
             <div
               className={`${

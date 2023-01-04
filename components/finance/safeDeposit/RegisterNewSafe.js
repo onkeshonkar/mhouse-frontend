@@ -40,11 +40,11 @@ const RegisterNewSafe = ({ onClose, mutate }) => {
 
   return (
     <div className="flex flex-col relative ">
-      <button onClick={onClose} className="absolute right-0 mt-20">
+      <button onClick={onClose} className="absolute right-0 mt-10">
         <Close />
       </button>
 
-      <h2 className="text-4xl font-semibold my-20">
+      <h2 className="text-4xl font-semibold my-10">
         Register New Safe Deposite
       </h2>
 

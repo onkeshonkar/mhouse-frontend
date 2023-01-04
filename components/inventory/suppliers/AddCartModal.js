@@ -64,7 +64,7 @@ const AddCartModal = ({ onClose, supplier, mutateOrder }) => {
   const handleSubmit = async () => {
     const data = {
       upfrontPayment: upfront,
-      orderItems: cart,
+      orderItems: cart.filter((c) => c.quantity > 0),
       paymentMethod,
       supplier,
     }

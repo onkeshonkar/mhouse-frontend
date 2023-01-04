@@ -18,8 +18,8 @@ const schema = z.object({
     .string()
     .min(3, { message: "Name should be at least 3 char" })
     .max(50),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Phone No.should be 10 digits with country code +61",
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Phone No.should be 10 digits with country code +91",
   }),
   email: z.string().email({ message: "Please enter a valid email" }),
   dateOfBirth: z.string({

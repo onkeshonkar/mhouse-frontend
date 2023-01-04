@@ -203,25 +203,6 @@ const OrderDetails = ({ handleSubmit, onBack }) => {
         </div>
 
         <div className="flex flex-col justify-between">
-          {/* <ul className="flex flex-col gap-1">
-            {cart.map((cartItem) => (
-              <li
-                key={cartItem.id}
-                className=" rounded-2xl px-3 py-1.5 grid grid-cols-5 gap-5 bg-background items-center"
-              >
-                <div className="flex flex-col gap-2 col-span-2">
-                  <span className="text-sm">{cartItem.name}</span>
-                  <span className="text-xs opacity-80">
-                    ( {cartItem.sellPrice} $)
-                  </span>
-                </div>
-                <span>{cartItem.quantity} </span>
-                <span>{cartItem.sellPrice * cartItem.quantity} $</span>
-                <Delete width={16} height={16} className="text-x-red" />
-              </li>
-            ))}
-          </ul> */}
-
           <div className="h-80 overflow-x-auto">
             <table className="min-w-full border-spacing-y-1 border-separate">
               <thead className="bg-[#F1F1F5]">

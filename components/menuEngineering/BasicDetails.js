@@ -55,8 +55,7 @@ const BasicDetails = ({ onNext, onBack }) => {
   })
 
   const onSubmit = async (data) => {
-    if (!avatar) return toast.error("Select product photo.")
-    // console.log(data)
+    // if (!avatar) return toast.error("Select product photo.")
     setMenuDetails({ ...data, avatar, season, category })
     onNext()
   }

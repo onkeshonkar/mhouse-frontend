@@ -54,7 +54,7 @@ const Instructions = ({ onNext, onBack }) => {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold mt-20 mb-10">
+      <h2 className="text-4xl font-semibold mb-10">
         Let We Subscribe Some Instructions
       </h2>
 

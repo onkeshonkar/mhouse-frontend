@@ -23,7 +23,7 @@ const schema = z.object({
     .string()
     .min(3, { message: "Name should be at least 3 char" })
     .max(50),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
     message: "Phone No.should be 10 digits with country code +61",
   }),
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -158,7 +158,7 @@ const Signup = () => {
                 <Input
                   type="text"
                   label="Phone Number"
-                  defaultValue={"+61"}
+                  defaultValue={"+91"}
                   autoComplete="phoneNumber"
                   {...register("phoneNumber")}
                   error={errors.phoneNumber}

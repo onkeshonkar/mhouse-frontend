@@ -17,8 +17,8 @@ const genders = ["Male", "Female", "Others"]
 const schema = z.object({
   fullName: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
   dateOfBirth: z.string().min(3, { message: "Invalid date" }),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Must be 10 digits with country code +61",
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Must be 10 digits with country code +91",
   }),
   email: z.string().email({ message: "Invalid email address" }),
   fullAddress: z
@@ -160,7 +160,7 @@ const BasicInfo = ({ onBack, onNext, onCancel }) => {
               label="Phone Number"
               autoComplete="phoneNumber"
               className="w-[350px]"
-              defaultValue={emp.phoneNumber || "+61"}
+              defaultValue={emp.phoneNumber || "+91"}
               {...register("phoneNumber")}
               error={errors.phoneNumber}
             />

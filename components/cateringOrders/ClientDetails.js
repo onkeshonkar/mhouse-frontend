@@ -16,7 +16,7 @@ const deliveryMethods = ["Delivery", "Pickup"]
 
 const schema = z.object({
   fullName: z.string().min(3, { message: "Must be at least 3 char" }).max(50),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
     message: "Must be 10 digits with country code +61",
   }),
   deliveryDate: z.string().min(3, { message: "Invalid date" }),
@@ -124,7 +124,7 @@ const ClientDetails = ({ onNext, onBack }) => {
               autoComplete="phoneNumber"
               className="w-[350px]"
               label="Client Phone Number"
-              defaultValue={orderDetails.phoneNumber || "+61"}
+              defaultValue={orderDetails.phoneNumber || "+91"}
               {...register("phoneNumber")}
               error={errors.phoneNumber}
             />

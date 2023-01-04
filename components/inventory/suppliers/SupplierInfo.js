@@ -16,11 +16,11 @@ const schema = z.object({
   portalURL: z.string().regex(/^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/, {
     message: "Invalid url",
   }),
-  phoneNumber: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Must be 10 digits with country code +61",
+  phoneNumber: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Must be 10 digits with country code +91",
   }),
-  officePhone: z.string().regex(/^(\+61)\d{10}$/, {
-    message: "Must be 10 digits with country code +61",
+  officePhone: z.string().regex(/^(\+91)\d{10}$/, {
+    message: "Must be 10 digits with country code +91",
   }),
   fullAddress: z
     .string()
@@ -58,7 +58,7 @@ const SupplierInfo = ({ onNext, onBack }) => {
 
   return (
     <>
-      <h2 className="text-4xl font-semibold mt-20 mb-10">
+      <h2 className="text-4xl font-semibold mb-10">
         Add Basic Info Of Supplier
       </h2>
 
@@ -140,7 +140,7 @@ const SupplierInfo = ({ onNext, onBack }) => {
             label="Mobile"
             autoComplete="phoneNumber"
             className="w-[350px]"
-            defaultValue={supplier.phoneNumber || "+61"}
+            defaultValue={supplier.phoneNumber || "+91"}
             {...register("phoneNumber")}
             error={errors.phoneNumber}
           />
@@ -149,7 +149,7 @@ const SupplierInfo = ({ onNext, onBack }) => {
             label="Office Phone"
             autoComplete="phoneNumber"
             className="w-[350px]"
-            defaultValue={supplier.officePhone || "+61"}
+            defaultValue={supplier.officePhone || "+91"}
             {...register("officePhone")}
             error={errors.officePhone}
           />
