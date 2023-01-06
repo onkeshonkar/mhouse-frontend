@@ -6,6 +6,7 @@ import toast from "react-hot-toast"
 import Input from "../../components/ui/Input"
 import Button from "../../components/ui/Button"
 import { Logo, Arrow } from "../../components/icons"
+import Link from "next/link"
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -26,7 +27,11 @@ const ForgotPassword = () => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="py-10">
-        <Logo />
+        <Link href="/">
+          <a>
+            <Logo />
+          </a>
+        </Link>
       </div>
       {console.log("body")}
       <div className="bg-white px-20 py-10 rounded-2xl text-center shadow-2xl">

@@ -10,6 +10,7 @@ import Avatar from "../../components/ui/Avatar"
 import OTPBox from "../../components/ui/OTPBox"
 import { useState } from "react"
 import useRedirectDashboard from "../../hooks/useRedirectDashboard"
+import Link from "next/link"
 
 const schema = z.object({
   password: z.string().regex(/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,16}$/, {
@@ -49,7 +50,11 @@ const LoginInvite = () => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="py-10">
-        <Logo />
+        <Link href="/">
+          <a>
+            <Logo />
+          </a>
+        </Link>
       </div>
 
       <div className="bg-white px-20 py-10 rounded-2xl text-center shadow-2xl">

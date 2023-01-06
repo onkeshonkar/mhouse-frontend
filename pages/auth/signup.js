@@ -13,6 +13,7 @@ import useRedirectDashboard from "../../hooks/useRedirectDashboard"
 import useUserStore from "../../stores/useUserStore"
 import { APIService } from "../../lib/axios"
 import { useRouter } from "next/router"
+import Link from "next/link"
 
 const schema = z.object({
   venueName: z
@@ -115,7 +116,11 @@ const Signup = () => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="py-10">
-        <Logo />
+        <Link href="/">
+          <a>
+            <Logo />
+          </a>
+        </Link>
       </div>
 
       <div className="bg-white px-20 py-10 rounded-2xl text-center shadow-2xl">
