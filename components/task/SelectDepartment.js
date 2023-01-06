@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { Arrow, Close } from "../icons"
 import Button from "../ui/Button"
@@ -31,14 +31,17 @@ const SelectDepartment = ({ onSubmit, onCancel, onBack }) => {
       return toast.error("Select repeat Date")
     }
     setIsLoading(true)
-    await updateTask({
+
+    updateTask({
       departments,
       isRepeatType,
-      ...(isRepeatType && { repeatType }),
-      ...(isRepeatType && repeatType === "Weekly" && { repeatDay }),
-      ...(isRepeatType && repeatType === "Monthly" && { repeateDate }),
+      repeatType,
+      repeatDay,
+      repeateDate,
     })
+
     await onSubmit()
+
     setIsLoading(false)
   }
 
