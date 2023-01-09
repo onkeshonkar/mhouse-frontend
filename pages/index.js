@@ -24,7 +24,7 @@ export default function Home() {
         </Link>
 
         <div className="flex gap-6 items-center">
-          <Link href="/">
+          <Link href="https://github.com/onkeshonkar/mhouse-frontend">
             <a className="text-accent hover:underline">Examples</a>
           </Link>
 
