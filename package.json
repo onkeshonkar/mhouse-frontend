@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p ${PORT:-8080}",
+    "start": "next start",
     "lint": "next lint",
-    "export": "npm run build && next export -o "
+    "export": "npm run build && next export -o out"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.2",

@@ -3,7 +3,7 @@ import useSWRImmutable from "swr/immutable"
 
 import { Plus } from "../components/icons"
 import AddNewsFeed from "../components/newsFeed/AddNewsFeed"
-import NewsItem from "../components/newsFeed/newsItem"
+import NewsItem from "../components/newsFeed/NewsItem"
 import Modal from "../components/ui/Modal"
 import Spinner from "../components/ui/Spinner"
 import { fetcher } from "../lib/axios"

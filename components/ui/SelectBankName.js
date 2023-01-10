@@ -1,7 +1,7 @@
 import { Combobox } from "@headlessui/react"
 import { Fragment, useState } from "react"
 
-import banks from "../../utils/Banks"
+import banks from "../../utils/banks"
 import { Chevron, Check } from "../icons"
 
 const SelectBankName = ({ selectedBank, onChange }) => {
